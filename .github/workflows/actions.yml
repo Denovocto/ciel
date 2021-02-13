@@ -28,8 +28,6 @@ jobs:
         run: sudo apt-get install flex
       - name: install bison
         run: sudo apt-get install bison
-      - name: ls /usr/lib/i386-linux-gnu/
-        run: ls /usr/lib/i386-linux-gnu/
       - name: ls /usr/lib/x86_64-linux-gnu/
         run: ls /usr/lib/x86_64-linux-gnu/
       - name: ls /usr/lib/armhf-linux-gnu/
