@@ -1,11 +1,11 @@
-#What tech stack we use:
+# What tech stack we use:
 * Lex/Flex
 * YACC/Bison
 * C/C++
-#Commits
+# Commits
 Commits should be small aditions or fixes to the code base.
 Commits should follow the conventional commits standard which can be found [here](https://www.conventionalcommits.org/en/v1.0.0/).
-#Issues
+# Issues
 Issues should be created when some bug or error has been found in the code. 
 Features should be left out out of the issues section.
 #Pull Requests
