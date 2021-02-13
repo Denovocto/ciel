@@ -27,11 +27,11 @@ jobs:
       - name: install flex
         run: sudo apt-get install flex
       - name: install bison
-        run: sudo apt-get install bison
+        run: sudo apt-get install bison 
+      - name: locate libfl.a
+        run: sudo locate libfl.a
       - name: ls /usr/lib/x86_64-linux-gnu/
         run: ls /usr/lib/x86_64-linux-gnu/
-      - name: ls /usr/lib/armhf-linux-gnu/
-        run: ls /usr/lib/armhf-linux-gnu/
       - name: make scanner
         run: make lexxer
       - name: make executable
