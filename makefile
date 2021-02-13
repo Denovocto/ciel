@@ -8,6 +8,6 @@ all: lexxer executable
 lexxer: $(LEX_SOURCE)
 	$(LEX) $(LEX_SOURCE)
 executable: lex.yy.c
-	$(CC) -o $(EXECUTABLE_NAME) lex.yy.c -ll
+	$(CC) -o $(EXECUTABLE_NAME) lex.yy.c -lfl
 clean: 
 	rm $(EXECUTABLE_NAME) lex.yy.c
