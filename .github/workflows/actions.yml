@@ -25,11 +25,12 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - name: install flex
-        run: sudo apt-get install flex
+        run: |
+              sudo apt-get update
+              sudo apt-get upgrade
+              sudo apt-get install flex libfl-dev
       - name: install bison
-        run: sudo apt-get install bison 
-      - name: locate libfl.a
-        run: sudo locate libfl.a
+        run: sudo apt-get install bison
       - name: ls /usr/lib/x86_64-linux-gnu/
         run: ls /usr/lib/x86_64-linux-gnu/
       - name: make scanner
