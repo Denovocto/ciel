@@ -27,7 +27,6 @@ jobs:
       - name: install flex
         run: |
               sudo apt-get update
-              sudo apt-get upgrade
               sudo apt-get install flex libfl-dev
       - name: install bison
         run: sudo apt-get install bison
