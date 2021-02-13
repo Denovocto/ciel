@@ -1,8 +1,8 @@
 
 CC=gcc
 LEX=flex
-LEX_SOURCE=ciel.lex
-EXECUTABLE_NAME=ciel
+LEX_SOURCE=scanner.lex
+EXECUTABLE_NAME=ciel_scanner
 
 all: lexxer executable
 lexxer: $(LEX_SOURCE)
