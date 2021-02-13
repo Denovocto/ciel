@@ -4,7 +4,7 @@
 * Reason: 
 * Additional Comments:
 # Checklist
-[ ] compiles
-[ ] no run-time errors
-[ ] tested
-[ ] documented
+[] compiles
+[] no run-time errors
+[] tested
+[] documented
