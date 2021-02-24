@@ -1,5 +1,5 @@
 # Ciel
-The Ciel programming language utilizes images as a source.
+The Ciel programming language keeps programming clean, simple and fun.
 
 # Contributors
 * Cindy M. Mendez Aviles
