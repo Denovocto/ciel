@@ -43,3 +43,4 @@ ciel_scanner
 *.swp
 lex.yy.c
 lex.yy.cpp
+.vscode
