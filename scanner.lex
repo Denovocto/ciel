@@ -1,10 +1,13 @@
 %{
 #include <math.h>
+#include <assert.h>
 int num_lines = 0;
 void stripFirstAndLast(char* str)
 {
-	str = str + 1; // strips first character
-	str[strlen(str)-1] = 0; // strips last character
+	assert(str != 0);
+	size_t len = strlen(str);
+	memmove(str, str+1, len); // strips first character
+	str[strlen(str) - 1] = 0; // strips last character
 }
 %}
 %x lnk
@@ -31,7 +34,6 @@ WHITESPACE [ \t\n]+
 <lnk>\"[^"\\\t\n]+\" 			{
 						char* filename = malloc(strlen(yytext) + 1);
 						strcpy(filename, yytext);
-						printf("first:%s\n", filename);
 						stripFirstAndLast(filename);
 						printf("last: %s\n", filename);
 						yyin = fopen( filename, "r" );
