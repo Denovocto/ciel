@@ -42,5 +42,7 @@ ciel_scanner
 .DS_Store
 *.swp
 lex.yy.c
-lex.yy.cpp
+lex.yy.cc
 .vscode
+scanner.c
+scanner.h
