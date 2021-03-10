@@ -1,4 +1,4 @@
-link IOlib.
+link "example_link.cl"
 
 | This is an example program |
 function<int> main()
