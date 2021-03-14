@@ -1,8 +1,7 @@
 %{
-#include "tokens.h"
+#include "y.tab.h"
 #include <math.h>
 #include <assert.h>
-
 
 // Used for stripping first and last character of a string 
 // Destructive modify
@@ -26,20 +25,78 @@ INTEGER [0-9]+
 FLOAT [0-9]+[.][0-9]+
 CHAR \"([^'\\\n]|\\.)\"
 STRING \"(\\.|[^"\\])*\"
+BOOL true|false
 PRIMITIVE char|string|int|float|bool|null
-KEYWORD function|return|until|while|for|do|goto|if|var|ptr
-OPERATOR \+=|-=|%=|\*=|\/=|\+\+|--|\+|-|!|\?|\*|\/|%|\^\^|\|\||&&|\^|\||&|=|put|:|<|>|<=|>=|==|!=
 IDENTIFIER [A-Za-z][A-Za-z0-9]*
-SYMBOL \.|\(|\)|,|->|<-|=>|\[|\]
 COMMENT \|[^|]*\|
 WHITESPACE [ \t\n]+
 %%
 ^"link"[ \t]*\" 				BEGIN(lnk);
-{INTEGER} 						return INTEGER_TOKEN;
-{FLOAT} 						return FLOAT_TOKEN;
-{CHAR} 							return CHAR_TOKEN;
-{STRING}      					return STRING_TOKEN;
-{PRIMITIVE} 					return PRIMITIVE_TOKEN;
+
+{INTEGER} 						{yyval.integer = atoi(yytext); return TOK_INTEGER_LIT}	/*							LITERALS								*/
+{FLOAT} 						copy_and_return(TOK_FLOAT_LIT);
+{CHAR} 							copy_and_return(TOK_CHAR_LIT);
+{STRING}      					copy_and_return(TOK_STRING_LIT);
+{BOOL}|{INTEGER}				copy_and_return(TOK_BOOL_LIT);
+
+"char"							return TOK_CHAR_PR;					/*							PRIMITIVES								*/
+"string"						return TOK_STRING_PR;
+"int"							return TOK_INTEGER_PR;
+"float"							return TOK_FLOAT_PR;
+"bool"							return TOK_BOOL_PR;
+"null"							return TOK_NULL_PR;
+
+"function"						return TOK_FUNCT_KEY;				/*							KEYWORDS								*/
+"return"						return TOK_RETURN_KEY;
+"until"							return TOK_UNTIL_KEY;
+"while"							return TOK_WHILE_KEY;
+"for"							return TOK_FOR_KEY;
+"do"							return TOK_DO_KEY;
+"goto"							return TOK_GOTO_KEY;
+"if"							return TOK_IF_KEY;
+"var"							return TOK_VAR_KEY;
+"ptr"							return TOK_PTR_KEY;
+
+"\+="							return TOK_SUMEQ_OP;				/*							OPERATORS								*/
+"\-="							return TOK_MINEQ_OP;
+"%="							return TOK_MODEQ_OP;
+"\*="							return TOK_MULTEQ_OP;
+"\/="							return TOK_DIVEQ_OP;
+"\+\+"							return TOK_INC_OP;
+"--"							return TOK_DEC_OP;
+"\+"							return TOK_SUM_OP;
+"-"								return TOK_MINUS_OP;
+"!"								return TOK_NOT_OP;
+"\?"							return TOK_QSTN_OP;
+"\*"							return TOK_MULT_OP;
+"\/"							return TOK_DIV_OP;
+"%"								return TOK_MOD_OP;
+"\^\^"							return TOK_EXP_OP;
+"\|\|"							return TOK_OR_OP;
+"&&"							return TOK_AND_OP;
+"\^"							return TOK_BITXOR_OP;
+"\|"							return TOK_BITOR_OP;
+"&"								return TOK_BITAND_OP;
+"=="							return TOK_TEQ_OP;
+"<="							return TOK_LEQ_OP;
+">="							return TOK_GEQ_OP;
+"!="							return TOK_NEQ_OP;
+"="								return TOK_EQ_OP;
+"put"							return TOK_PUT_OP;
+":"								return TOK_COLON_OP;
+"<"								return TOK_LESS_OP;
+">"								return TOK_GRTR_OP;
+
+"\."							return TOK_DOT_SBL;					/*							SYMBOLS								*/
+"\("							return TOK_LPAR_SBL;
+"\)"							return TOK_RPAR_SBL;
+","								return TOK_COMMA_SBL;
+"->"							return TOK_LARROW_SBL;
+"<-"							return TOK_RARROW_SBL;
+"=>"							return TOK_FATCOMMA_SBL;
+"\["							return TOK_LBRACKET_SBL;
+"\]"							return TOK_RBRACKET_SBL;
+
 <lnk>\"          				BEGIN(INITIAL); 
 <lnk>[ \t]* 					/* Eat Whitespace */
 <lnk>[^\"]+ 					{
@@ -72,12 +129,9 @@ WHITESPACE [ \t\n]+
 										BEGIN(lnk);
 									}
 								}
-"<"{PRIMITIVE}">"|"<"{IDENTIFIER}">" return DATATYPE_SPECIFIER_TOKEN;
-{KEYWORD} 						return KEYWORD_TOKEN;
-{OPERATOR} 						return OPERATOR_TOKEN;
-{IDENTIFIER} 					return IDENTIFIER_TOKEN;
-{SYMBOL} 						return SYMBOL_TOKEN;
-{IDENTIFIER}: 					return LABEL_TOKEN;
+"<"{PRIMITIVE}">"|"<"{IDENTIFIER}">" copy_and_return(TOK_DATATYPE_SPECIFIER);
+{IDENTIFIER} 					copy_and_return(TOK_IDENTIFIER);
+{IDENTIFIER}: 					copy_and_return(TOK_LABEL);
 {COMMENT} 						;
 {WHITESPACE} 					;
 . 								return UNIDENTIFIED_TOKEN;
