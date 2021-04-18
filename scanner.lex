@@ -1,8 +1,10 @@
 %{
-#include "y.tab.h"
+#include "parser.tab.h"
 #include <math.h>
 #include <assert.h>
 
+
+// add free for strdup
 // Used for stripping first and last character of a string 
 // Destructive modify
 void stripFirstAndLast(char* str)
@@ -33,11 +35,22 @@ WHITESPACE [ \t\n]+
 %%
 ^"link"[ \t]*\" 				BEGIN(lnk);
 
-{INTEGER} 						{yyval.integer = atoi(yytext); return TOK_INTEGER_LIT}	/*							LITERALS								*/
-{FLOAT} 						copy_and_return(TOK_FLOAT_LIT);
-{CHAR} 							copy_and_return(TOK_CHAR_LIT);
-{STRING}      					copy_and_return(TOK_STRING_LIT);
-{BOOL}|{INTEGER}				copy_and_return(TOK_BOOL_LIT);
+{INTEGER} 						{yyval.integer = atoi(yytext); return TOK_INTEGER_LIT;}	/*							LITERALS								*/
+{FLOAT} 						{yyval.floating_point = atof(yytext); return TOK_FLOAT_LIT;}
+{CHAR} 							{yyval.character = yytext[1]; return TOK_CHAR_LIT;} // 1 para escapar la comilla inicial del caracter '
+{STRING}      					{yyval.string = strdup(yytext); return TOK_STRING_LIT;}
+{BOOL}							{
+									//strcmp 
+									if(strcmp(yytext, "true"))
+									{
+										yyval.bool = 1; //1 o 0 
+									}
+									else
+									{	
+										yyval.bool = 0; //1 o 0 
+									}
+									return TOK_BOOL_LIT;
+								}
 
 "char"							return TOK_CHAR_PR;					/*							PRIMITIVES								*/
 "string"						return TOK_STRING_PR;
@@ -129,9 +142,10 @@ WHITESPACE [ \t\n]+
 										BEGIN(lnk);
 									}
 								}
-"<"{PRIMITIVE}">"|"<"{IDENTIFIER}">" copy_and_return(TOK_DATATYPE_SPECIFIER);
-{IDENTIFIER} 					copy_and_return(TOK_IDENTIFIER);
-{IDENTIFIER}: 					copy_and_return(TOK_LABEL);
+"<"{PRIMITIVE}">"				{yyval.specifier = strdup(stripFirstAndLast(yytext)); return TOK_SPECIFIER_PR;}
+"<"{IDENTIFIER}">"				{yyval.specifier = strdup(stripFirstAndLast(yytext)); return TOK_IDENTIFIER_SBL;}
+{IDENTIFIER} 					{yyval.identifier = strdup(yytext); return TOK_IDENTIFIER;}
+{IDENTIFIER}: 					{yyval.label = strdup(yytext); return TOK_LABEL_IDENTIFIER;}
 {COMMENT} 						;
 {WHITESPACE} 					;
 . 								return UNIDENTIFIED_TOKEN;
@@ -141,34 +155,3 @@ int yywrap(void)
 {
 	return 1;
 }
-char* tokens[] = {NULL, "INTEGER", "FLOAT", "CHAR", "STRING", "PRIMITIVE",
-				"DATATYPE_SPECIFIER", "KEYWORD", "OPERATOR", "IDENTIFIER",
-				"SYMBOL", "LABEL", "UNIDENTIFIED"};
-int main(int argc, char **argv)
-{
-	++argv, --argc;
-	if (argc > 0)
-		yyin = fopen(argv[0], "r");
-	else
-		yyin = stdin;
-	int tokenNumber, tokenValue;
-	tokenNumber = yylex();
-	while(tokenNumber)
-	{
-		printf("tokenID: %d\n", tokenNumber);
-		printf("token: %s\n", tokens[tokenNumber]);
-		switch(tokenNumber)
-		{
-			case UNIDENTIFIED_TOKEN:
-			{
-				printf("Unexpected character found: %s in line %d\n", yytext, yylineno);
-				exit(1);
-			}
-			default:
-				;
-		}
-		tokenNumber = yylex();
-	}
-	return 0;
-}
-
