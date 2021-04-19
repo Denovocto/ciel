@@ -47,4 +47,7 @@ y.tab.c
 y.tab.h
 parser.tab.c
 parser.tab.h
+parser.tab.cpp
+parser.tab.hpp
+scanner.h
 .vscode

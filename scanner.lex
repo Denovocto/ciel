@@ -1,7 +1,8 @@
 %{
-#include "parser.tab.h"
+#include "parser.tab.hpp"
 #include <math.h>
 #include <assert.h>
+#include <string.h>
 
 
 // add free for strdup
@@ -35,19 +36,19 @@ WHITESPACE [ \t\n]+
 %%
 ^"link"[ \t]*\" 				BEGIN(lnk);
 
-{INTEGER} 						{yyval.integer = atoi(yytext); return TOK_INTEGER_LIT;}	/*							LITERALS								*/
-{FLOAT} 						{yyval.floating_point = atof(yytext); return TOK_FLOAT_LIT;}
-{CHAR} 							{yyval.character = yytext[1]; return TOK_CHAR_LIT;} // 1 para escapar la comilla inicial del caracter '
-{STRING}      					{yyval.string = strdup(yytext); return TOK_STRING_LIT;}
+{INTEGER} 						{yylval.integer = atoi(yytext); return TOK_INTEGER_LIT;}	/*							LITERALS								*/
+{FLOAT} 						{yylval.floating_point = atof(yytext); return TOK_FLOAT_LIT;}
+{CHAR} 							{yylval.character = yytext[1]; return TOK_CHAR_LIT;} // 1 para escapar la comilla inicial del caracter '
+{STRING}      					{yylval.string = strdup(yytext); return TOK_STRING_LIT;}
 {BOOL}							{
 									//strcmp 
 									if(strcmp(yytext, "true"))
 									{
-										yyval.bool = 1; //1 o 0 
+										yylval.boolean = 1; //1 o 0 
 									}
 									else
 									{	
-										yyval.bool = 0; //1 o 0 
+										yylval.boolean = 0; //1 o 0 
 									}
 									return TOK_BOOL_LIT;
 								}
@@ -109,7 +110,9 @@ WHITESPACE [ \t\n]+
 "=>"							return TOK_FATCOMMA_SBL;
 "\["							return TOK_LBRACKET_SBL;
 "\]"							return TOK_RBRACKET_SBL;
-
+"stdout"						return TOK_STDOUT_STREAM;			/*							MACROS								*/
+"stdin"							return TOK_STDIN_STREAM;
+"print"							return TOK_PRINT_MACRO;
 <lnk>\"          				BEGIN(INITIAL); 
 <lnk>[ \t]* 					/* Eat Whitespace */
 <lnk>[^\"]+ 					{
@@ -142,10 +145,9 @@ WHITESPACE [ \t\n]+
 										BEGIN(lnk);
 									}
 								}
-"<"{PRIMITIVE}">"				{yyval.specifier = strdup(stripFirstAndLast(yytext)); return TOK_SPECIFIER_PR;}
-"<"{IDENTIFIER}">"				{yyval.specifier = strdup(stripFirstAndLast(yytext)); return TOK_IDENTIFIER_SBL;}
-{IDENTIFIER} 					{yyval.identifier = strdup(yytext); return TOK_IDENTIFIER;}
-{IDENTIFIER}: 					{yyval.label = strdup(yytext); return TOK_LABEL_IDENTIFIER;}
+"<"{PRIMITIVE}">"				{yylval.specifier = strdup(stripFirstAndLast(yytext)); return TOK_SPECIFIER_PR;}
+{IDENTIFIER} 					{yylval.identifier = strdup(yytext); return TOK_IDENTIFIER;}
+{IDENTIFIER}: 					{yylval.label = strdup(yytext); return TOK_LABEL_IDENTIFIER;}
 {COMMENT} 						;
 {WHITESPACE} 					;
 . 								return UNIDENTIFIED_TOKEN;
