@@ -1,56 +1,41 @@
-
-%{
+%code top {
     #include <stdio.h>                          
     #include <string.h>
     #include <unordered_map>
     #include <math.h>
-void yyerror (char *s);
-struct symrec {
+    #include <iostream>
+    #include <stdlib.h>
+}
+%code requires {
+    typedef struct symrec {
     int type;
-    symrec();
-    symrec(int tpe, int intger){
-        type = tpe;
-        value.integer = intger;
-    }
-    symrec(int tpe, double fltng_pnt){
-        type = tpe;
-        value.floating_point = fltng_pnt;
-    }
-    symrec(int tpe, char str[]){
-        type = tpe;
-        value.string[] = str[];
-    }
-    symrec(int tpe, int chracter){
-        type = tpe;
-        value.character = chracter;
-    }
-    symrec(int tpe, bool blean){
-        type = tpe;
-        value.boolean = blean;
-    }
     union {
         int integer;
         double floating_point;
         int boolean;
-        char string[128];
+        char* string;
         char character;
     } value;
-};
-std::unordered_map<std::string, symrec> symbolTable;
-extern int  yylexlinenum;                   /* these are in YYlex      */
-extern char *yytext;                        /* current token           */
-enum dataTypes{
-    INTEGER,
-    CHARACTER,
-    FLOAT, 
-    BOOL,
-    STRING
-};
-%}
+} symbol;
+}
+%code {
+    void yyerror (char *s);                   /* these are in YYlex      */
+    extern int yylineno;
+    extern FILE *yyin;
+    extern "C" int yylex( void );                 /* current token           */
+    enum dataTypes{
+        INTEGER,
+        CHARACTER,
+        FLOAT, 
+        BOOL,
+        STRING
+    };
+    std::unordered_map<std::string, symbol> symbolTable;
+}
 %require "3.2"
 %union
 {
-    symrec term;
+    struct symrec term;
     char*   identifier;
     char* specifier;
     char* label;
@@ -140,9 +125,47 @@ enum dataTypes{
 %token                  TOK_PRINT_MACRO
 %%
 line    : assignment '.'		{;}
-        | TOK_PRINT_MACRO exp ';'			{std::cout << $2 << std::endl;}
+        | TOK_PRINT_MACRO exp '.'			{
+                                                switch($2.type)
+                                                {
+                                                    case INTEGER:
+                                                    std::cout << $2.value.integer << std::endl;
+                                                    break;
+                                                    case BOOL:
+                                                    std::cout << $2.value.boolean << std::endl;
+                                                    break;
+                                                    case FLOAT:
+                                                    std::cout << $2.value.floating_point << std::endl;
+                                                    break;
+                                                    case CHARACTER:
+                                                    std::cout << $2.value.character << std::endl;
+                                                    break;
+                                                    case STRING:
+                                                    std::cout << $2.value.string << std::endl;
+                                                    break;
+                                                }
+                                            }
 		| line assignment '.'	{;}
-		| line TOK_PRINT_MACRO exp '.'	{std::cout << $3 << std::endl;}
+		| line TOK_PRINT_MACRO exp '.'	{
+                                            switch($3.type)
+                                                {
+                                                    case INTEGER:
+                                                    std::cout << $3.value.integer << std::endl;
+                                                    break;
+                                                    case BOOL:
+                                                    std::cout << $3.value.boolean << std::endl;
+                                                    break;
+                                                    case FLOAT:
+                                                    std::cout << $3.value.floating_point << std::endl;
+                                                    break;
+                                                    case CHARACTER:
+                                                    std::cout << $3.value.character << std::endl;
+                                                    break;
+                                                    case STRING:
+                                                    std::cout << $3.value.string << std::endl;
+                                                    break;
+                                                }
+                                        }
         ;
 
 assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {   
@@ -162,23 +185,24 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
                                                                     symbolTable[$2] = $4;   
                                                                 }                                               
             | TOK_IDENTIFIER TOK_EQ_OP exp                      {
-                                                                    if(symbolTable.contains($1)) {
+                                                                    auto element = symbolTable.find($1);
+                                                                    if(element != symbolTable.end()) {
                                                                         switch(symbolTable[$1].type)
                                                                         {
                                                                             case INTEGER:
-                                                                            symbolTable[$1].value.integer = $3;
+                                                                            symbolTable[$1].value.integer = $3.value.integer;
                                                                             break;
                                                                             case BOOL:
-                                                                            symbolTable[$1].value.boolean = $3;
+                                                                            symbolTable[$1].value.boolean = $3.value.boolean;
                                                                             break;
                                                                             case FLOAT:
-                                                                            symbolTable[$1].value.floating_point = $3;
+                                                                            symbolTable[$1].value.floating_point = $3.value.floating_point;
                                                                             break;
                                                                             case CHARACTER:
-                                                                            symbolTable[$1].value.character = $3;
+                                                                            symbolTable[$1].value.character = $3.value.character;
                                                                             break;
                                                                             case STRING:
-                                                                            symbolTable[$1].value.string = $3;
+                                                                            symbolTable[$1].value.string = $3.value.string;
                                                                             break;
                                                                         }
                                                                     }
@@ -187,23 +211,25 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
                                                                     }
                                                                 }
             | TOK_IDENTIFIER TOK_SUMEQ_OP exp              {
-                                                            if(symbolTable.contains($1)) {
+                                                                auto element = symbolTable.find($1);
+                                                                if(element != symbolTable.end()) {
                                                                         switch(symbolTable[$1].type)
                                                                         {
                                                                             case INTEGER:
-                                                                            symbolTable[$1].value.integer += $3;
+                                                                            symbolTable[$1].value.integer += $3.value.integer;
                                                                             break;
                                                                             case BOOL:
-                                                                            symbolTable[$1].value.boolean += $3;
+                                                                            symbolTable[$1].value.boolean += $3.value.boolean;
                                                                             break;
                                                                             case FLOAT:
-                                                                            symbolTable[$1].value.floating_point += $3;
+                                                                            symbolTable[$1].value.floating_point += $3.value.floating_point;
                                                                             break;
                                                                             case CHARACTER:
-                                                                            symbolTable[$1].value.character += $3;
+                                                                            symbolTable[$1].value.character += $3.value.character;
                                                                             break;
                                                                             case STRING:
-                                                                            symbolTable[$1].value.string += $3;
+                                                                            yyerror("cannot sum and equal to string");
+                                                                            exit(1);
                                                                             break;
                                                                         }
                                                                     }
@@ -212,23 +238,25 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
                                                                     }
                                                         }
             | TOK_IDENTIFIER TOK_MINEQ_OP exp          {
-                                                            if(symbolTable.contains($1)) {
+                                                            auto element = symbolTable.find($1);
+                                                            if(element != symbolTable.end()){
                                                                         switch(symbolTable[$1].type)
                                                                         {
                                                                             case INTEGER:
-                                                                            symbolTable[$1].value.integer -= $3;
+                                                                            symbolTable[$1].value.integer -= $3.value.integer;
                                                                             break;
                                                                             case BOOL:
-                                                                            symbolTable[$1].value.boolean -= $3;
+                                                                            symbolTable[$1].value.boolean -= $3.value.boolean;
                                                                             break;
                                                                             case FLOAT:
-                                                                            symbolTable[$1].value.floating_point -= $3;
+                                                                            symbolTable[$1].value.floating_point -= $3.value.floating_point;
                                                                             break;
                                                                             case CHARACTER:
-                                                                            symbolTable[$1].value.character -= $3;
+                                                                            symbolTable[$1].value.character -= $3.value.character;
                                                                             break;
                                                                             case STRING:
-                                                                            symbolTable[$1].value.string -= $3;
+                                                                            yyerror("cannot minus and equal to string");
+                                                                            exit(1);
                                                                             break;
                                                                         }
                                                                     }
@@ -237,23 +265,25 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
                                                                     }
                                                         }
             | TOK_IDENTIFIER TOK_MULTEQ_OP exp           {
-                                                            if(symbolTable.contains($1)) {
+                                                            auto element = symbolTable.find($1);
+                                                            if(element != symbolTable.end()) {
                                                                         switch(symbolTable[$1].type)
                                                                         {
                                                                             case INTEGER:
-                                                                            symbolTable[$1].value.integer *= $3;
+                                                                            symbolTable[$1].value.integer *= $3.value.integer;
                                                                             break;
                                                                             case BOOL:
-                                                                            symbolTable[$1].value.boolean *= $3;
+                                                                            symbolTable[$1].value.boolean *= $3.value.boolean;
                                                                             break;
                                                                             case FLOAT:
-                                                                            symbolTable[$1].value.floating_point *= $3;
+                                                                            symbolTable[$1].value.floating_point *= $3.value.floating_point;
                                                                             break;
                                                                             case CHARACTER:
-                                                                            symbolTable[$1].value.character *= $3;
+                                                                            symbolTable[$1].value.character *= $3.value.character;
                                                                             break;
                                                                             case STRING:
-                                                                            symbolTable[$1].value.string *= $3;
+                                                                            yyerror("cannot multiply and equal to string");
+                                                                            exit(1);
                                                                             break;
                                                                         }
                                                                     }
@@ -262,23 +292,25 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
                                                                     }
                                                         }
             | TOK_IDENTIFIER TOK_DIVEQ_OP exp          {
-                                                             if(symbolTable.contains($1)) {
+                                                            auto element = symbolTable.find($1);
+                                                            if(element != symbolTable.end()) {
                                                                         switch(symbolTable[$1].type)
                                                                         {
                                                                             case INTEGER:
-                                                                            symbolTable[$1].value.integer /= $3;
+                                                                            symbolTable[$1].value.integer /= $3.value.integer;
                                                                             break;
                                                                             case BOOL:
-                                                                            symbolTable[$1].value.boolean /= $3;
+                                                                            symbolTable[$1].value.boolean /= $3.value.boolean;
                                                                             break;
                                                                             case FLOAT:
-                                                                            symbolTable[$1].value.floating_point /= $3;
+                                                                            symbolTable[$1].value.floating_point /= $3.value.floating_point;
                                                                             break;
                                                                             case CHARACTER:
-                                                                            symbolTable[$1].value.character /= $3;
+                                                                            symbolTable[$1].value.character /= $3.value.character;
                                                                             break;
                                                                             case STRING:
-                                                                            symbolTable[$1].value.string /= $3;
+                                                                            yyerror("cannot divide and equal to string");
+                                                                            exit(1);
                                                                             break;
                                                                         }
                                                                     }
@@ -287,23 +319,26 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
                                                                     }
                                                         }
             | TOK_IDENTIFIER TOK_MODEQ_OP exp           {
-                                                             if(symbolTable.contains($1)) {
+                                                            auto element = symbolTable.find($1);
+                                                            if(element != symbolTable.end()) {
                                                                         switch(symbolTable[$1].type)
                                                                         {
                                                                             case INTEGER:
-                                                                            symbolTable[$1].value.integer %= $3;
+                                                                            symbolTable[$1].value.integer %= $3.value.integer;
                                                                             break;
                                                                             case BOOL:
-                                                                            symbolTable[$1].value.boolean %= $3;
+                                                                            symbolTable[$1].value.boolean %= $3.value.boolean;
                                                                             break;
                                                                             case FLOAT:
-                                                                            symbolTable[$1].value.floating_point %= $3;
+                                                                            yyerror("cannot modulus and equal to double");
+                                                                            exit(1);
                                                                             break;
                                                                             case CHARACTER:
-                                                                            symbolTable[$1].value.character %= $3;
+                                                                            symbolTable[$1].value.character %= $3.value.character;
                                                                             break;
                                                                             case STRING:
-                                                                            symbolTable[$1].value.string %= $3;
+                                                                            yyerror("cannot modulus and equal to string");
+                                                                            exit(1);
                                                                             break;
                                                                         }
                                                                     }
@@ -333,7 +368,7 @@ exp    	: term                          {
                                                 $$.value.character = $1.value.character;
                                                 break;
                                                 case STRING:
-                                                $$.type = STRING
+                                                $$.type = STRING;
                                                 $$.value.string = $1.value.string;
                                                 break;
                                             }
@@ -358,8 +393,9 @@ exp    	: term                          {
                                                 $$.value.character = $1.value.character + $3.value.floating_point;     
                                                 break;
                                                 case STRING:
-                                                $$.type = STRING
-                                                $$.value.string = $1.value.string + $3.value.string;
+                                                $$.type = STRING;
+                                                yyerror("cannot add strings");
+                                                exit(1);
                                                 break; 
                                             }
                                         }
@@ -450,12 +486,12 @@ exp    	: term                          {
                                                 $$.value.boolean = $1.value.boolean % $3.value.boolean;
                                                 break;
                                                 case FLOAT:
-                                                $$.type = FLOAT;
-                                                $$.value.floating_point = $1.value.floating_point % $3.value.floating_point;
+                                                yyerror("cannot modulus floating point");
+                                                exit(1);
                                                 break;
                                                 case CHARACTER:
                                                 $$.type = CHARACTER;
-                                                $$.value.character = $1.value.character % $3.value.floating_point;     
+                                                $$.value.character = $1.value.character % $3.value.character;     
                                                 break;
                                                 case STRING:
                                                 yyerror("cannot modulus strings");
@@ -508,7 +544,7 @@ exp    	: term                          {
                                                     $$.value.character = $2.value.character;
                                                     break;
                                                     case STRING:
-                                                    $$.type = STRING
+                                                    $$.type = STRING;
                                                     $$.value.string = $2.value.string;
                                                     break;
                                                 }
@@ -537,34 +573,39 @@ term   	    : TOK_INTEGER_LIT               {
                                                 $$.value.boolean = $1;
                                             }
             | TOK_IDENTIFIER		{
-                                    if(symbolTable.contains($1)){
-                                        switch(symbolTable[$1].type)
-                                        {
-                                            case INTEGER:
-                                            $$ = symbolTable[$1].value.integer
-                                            break;
-                                            case BOOL:
-                                            $$ = symbolTable[$1].value.boolean
-                                            break;
-                                            case FLOAT:
-                                            $$ = symbolTable[$1].value.floating_point 
-                                            break;
-                                            case CHARACTER:
-                                            $$ = symbolTable[$1].value.character
-                                            break;
-                                            case STRING:
-                                            $$ = symbolTable[$1].value.string
-                                            break;
+                                        auto element = symbolTable.find($1);
+                                        if(element != symbolTable.end()){
+                                            switch(symbolTable[$1].type)
+                                            {
+                                                case INTEGER:
+                                                $$.type = INTEGER;
+                                                $$.value.integer = symbolTable[$1].value.integer;
+                                                break;
+                                                case BOOL:
+                                                $$.type = BOOL;
+                                                $$.value.boolean = symbolTable[$1].value.boolean;
+                                                break;
+                                                case FLOAT:
+                                                $$.type = FLOAT;
+                                                $$.value.floating_point = symbolTable[$1].value.floating_point ;
+                                                break;
+                                                case CHARACTER:
+                                                $$.type = CHARACTER;
+                                                $$.value.character = symbolTable[$1].value.character;
+                                                break;
+                                                case STRING:
+                                                $$.type = STRING;
+                                                $$.value.string = symbolTable[$1].value.string;
+                                                break;
+                                            }
                                         }
-                                    }
-								    else{
-								 	    yyerror("Var doesn't exist!");
-           						    	exit(0);
-								    }
+                                        else{
+                                            yyerror("Var doesn't exist!");
+                                            exit(0);
+                                        }
 								 	}
         ;
 %%
-
 
 int main(int argc, char **argv)
 {
@@ -577,8 +618,8 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-int yyerror(char *message)
+void yyerror(char *message)
 {
     extern FILE *yyout;
-    fprintf(yyout,"\nError at line %5d. (%s) \n", yylexlinenum,message);
+    fprintf(yyout,"\nError at line %5d. (%s) \n", yylineno,message);
 }

@@ -3,8 +3,7 @@
 #include <math.h>
 #include <assert.h>
 #include <string.h>
-
-
+#include <stdlib.h>
 // add free for strdup
 // Used for stripping first and last character of a string 
 // Destructive modify
@@ -20,7 +19,7 @@ void stripFirstAndLast(char* str)
 #define MAX_INCLUDE_DEPTH 15
 YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
 int include_count = 0;
-
+int yylineno = 0;
 %}
 %option nounput yylineno
 %x lnk
@@ -145,9 +144,10 @@ WHITESPACE [ \t\n]+
 										BEGIN(lnk);
 									}
 								}
-"<"{PRIMITIVE}">"				{yylval.specifier = strdup(stripFirstAndLast(yytext)); return TOK_SPECIFIER_PR;}
+"<"{PRIMITIVE}">"				{stripFirstAndLast(yytext); yylval.specifier = strdup(yytext); return TOK_SPECIFIER_PR;}
 {IDENTIFIER} 					{yylval.identifier = strdup(yytext); return TOK_IDENTIFIER;}
 {IDENTIFIER}: 					{yylval.label = strdup(yytext); return TOK_LABEL_IDENTIFIER;}
+"\n"							{yylineno++;}
 {COMMENT} 						;
 {WHITESPACE} 					;
 . 								return UNIDENTIFIED_TOKEN;
