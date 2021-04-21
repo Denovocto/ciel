@@ -46,7 +46,7 @@
     char   character;
 }
 /* Types */
-%type <term> exp term assignment
+%type <term> exp term
 /* Asociativity */
 /*							LITERALS								*/
 %token <integer>		TOK_INTEGER_LIT
@@ -124,8 +124,8 @@
 %token                  TOK_STDIN_STREAM
 %token                  TOK_PRINT_MACRO
 %%
-line    : assignment '.'		{;}
-        | TOK_PRINT_MACRO exp '.'			{
+line    : assignment TOK_DOT_SBL		{}
+        | TOK_PRINT_MACRO exp TOK_DOT_SBL			{
                                                 switch($2.type)
                                                 {
                                                     case INTEGER:
@@ -145,8 +145,8 @@ line    : assignment '.'		{;}
                                                     break;
                                                 }
                                             }
-		| line assignment '.'	{;}
-		| line TOK_PRINT_MACRO exp '.'	{
+		| line assignment TOK_DOT_SBL	{;}
+		| line TOK_PRINT_MACRO exp TOK_DOT_SBL	{
                                             switch($3.type)
                                                 {
                                                     case INTEGER:
@@ -184,7 +184,7 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
             |   TOK_STRING_PR TOK_IDENTIFIER TOK_EQ_OP exp      {
                                                                     symbolTable[$2] = $4;   
                                                                 }                                               
-            | TOK_IDENTIFIER TOK_EQ_OP exp                      {
+            |   TOK_IDENTIFIER TOK_EQ_OP exp                      {
                                                                     auto element = symbolTable.find($1);
                                                                     if(element != symbolTable.end()) {
                                                                         switch(symbolTable[$1].type)
@@ -524,7 +524,7 @@ exp    	: term                          {
                                                 break; 
                                             }
                                         }
-        | '(' exp ')'                       {
+        | TOK_LPAR_SBL exp TOK_RPAR_SBL                       {
                                                 switch($2.type)
                                                 {
                                                     case INTEGER:

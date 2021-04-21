@@ -49,5 +49,6 @@ parser.tab.c
 parser.tab.h
 parser.tab.cpp
 parser.tab.hpp
+*.dSYM
 scanner.h
 .vscode
