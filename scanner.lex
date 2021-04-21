@@ -1,28 +1,29 @@
 %{
-#include "parser.tab.hpp"
-#include <math.h>
-#include <assert.h>
-#include <string.h>
-#include <stdlib.h>
-// add free for strdup
-// Used for stripping first and last character of a string 
-// Destructive modify
-void stripFirstAndLast(char* str)
-{
-	assert(str != 0);
-	size_t len = strlen(str);
-	memmove(str, str+1, len); // strips first character
-	str[strlen(str) - 1] = 0; // strips last character
-}
+	#include "parser.tab.hpp"
+	#include <math.h>
+	#include <assert.h>
+	#include <string.h>
+	#include <stdlib.h>
+	// add free for strdup
+	// Used for stripping first and last character of a string 
+	// Destructive modify
+	void stripFirstAndLast(char* str)
+	{
+		assert(str != 0);
+		size_t len = strlen(str);
+		memmove(str, str+1, len); // strips first character
+		str[strlen(str) - 1] = 0; // strips last character
+	}
 
-// Defining Maximum include stack depth
-#define MAX_INCLUDE_DEPTH 15
-YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
-int include_count = 0;
-int yylineno = 0;
+	// Defining Maximum include stack depth
+	#define MAX_INCLUDE_DEPTH 15
+	YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
+	int include_count = 0;
+	extern int yylineno;
 %}
 %option nounput yylineno
 %x lnk
+
 INTEGER [0-9]+
 FLOAT [0-9]+[.][0-9]+
 CHAR \"([^'\\\n]|\\.)\"
@@ -32,15 +33,15 @@ PRIMITIVE char|string|int|float|bool|null
 IDENTIFIER [A-Za-z][A-Za-z0-9]*
 COMMENT \|[^|]*\|
 WHITESPACE [ \t\n]+
+
 %%
 ^"link"[ \t]*\" 				BEGIN(lnk);
 
 {INTEGER} 						{yylval.integer = atoi(yytext); return TOK_INTEGER_LIT;}	/*							LITERALS								*/
 {FLOAT} 						{yylval.floating_point = atof(yytext); return TOK_FLOAT_LIT;}
-{CHAR} 							{yylval.character = yytext[1]; return TOK_CHAR_LIT;} // 1 para escapar la comilla inicial del caracter '
+{CHAR} 							{yylval.character = yytext[1]; return TOK_CHAR_LIT;}
 {STRING}      					{yylval.string = strdup(yytext); return TOK_STRING_LIT;}
 {BOOL}							{
-									//strcmp 
 									if(strcmp(yytext, "true"))
 									{
 										yylval.boolean = 1; //1 o 0 
@@ -51,7 +52,6 @@ WHITESPACE [ \t\n]+
 									}
 									return TOK_BOOL_LIT;
 								}
-
 "char"							return TOK_CHAR_PR;					/*							PRIMITIVES								*/
 "string"						return TOK_STRING_PR;
 "int"							return TOK_INTEGER_PR;
@@ -112,7 +112,7 @@ WHITESPACE [ \t\n]+
 "stdout"						return TOK_STDOUT_STREAM;			/*							MACROS								*/
 "stdin"							return TOK_STDIN_STREAM;
 "print"							return TOK_PRINT_MACRO;
-<lnk>\"          				BEGIN(INITIAL); 
+<lnk>\"							BEGIN(INITIAL); 
 <lnk>[ \t]* 					/* Eat Whitespace */
 <lnk>[^\"]+ 					{
 									if ( include_count >= MAX_INCLUDE_DEPTH )
@@ -151,7 +151,6 @@ WHITESPACE [ \t\n]+
 {COMMENT} 						;
 {WHITESPACE} 					;
 . 								return UNIDENTIFIED_TOKEN;
-
 %%
 int yywrap(void)
 {
