@@ -42,13 +42,13 @@ WHITESPACE [ \t\n]+
 {CHAR} 							{yylval.character = yytext[1]; return TOK_CHAR_LIT;}
 {STRING}      					{stripFirstAndLast(yytext); yylval.string = strdup(yytext); return TOK_STRING_LIT;}
 {BOOL}							{
-									if(strcmp(yytext, "true"))
+									if(strcmp(yytext, "true") == 0)
 									{
-										yylval.boolean = 1; //1 o 0 
+										yylval.boolean = 1; 
 									}
 									else
 									{	
-										yylval.boolean = 0; //1 o 0 
+										yylval.boolean = 0;
 									}
 									return TOK_BOOL_LIT;
 								}
