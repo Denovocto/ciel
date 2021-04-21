@@ -5,7 +5,7 @@ function<int> main()
 ->
 	start:
 	ptr<int> a.
-	goto label.
+	goto start.
 	stdout put "Hello World".
 	return 0.
 <-
