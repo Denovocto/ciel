@@ -5,6 +5,7 @@
     #include <math.h>
     #include <iostream>
     #include <stdlib.h>
+    #include <stack>
 }
 %code requires {
     typedef struct symrec {
@@ -31,6 +32,7 @@
         STRING
     };
     std::unordered_map<std::string, symbol> symbolTable;
+    // std::stack<std::unordered_map<std::string, symbol> contextStack;
 }
 %require "3.2"
 %union
@@ -125,30 +127,29 @@
 %token                  TOK_PRINT_MACRO
 
 %%
-line    : assignment TOK_DOT_SBL		{}
-        | TOK_PRINT_MACRO exp TOK_DOT_SBL			{
-                                                switch($2.type)
-                                                {
-                                                    case INTEGER:
-                                                    std::cout << $2.value.integer << std::endl;
-                                                    break;
-                                                    case BOOL:
-                                                    std::cout << $2.value.boolean << std::endl;
-                                                    break;
-                                                    case FLOAT:
-                                                    std::cout << $2.value.floating_point << std::endl;
-                                                    break;
-                                                    case CHARACTER:
-                                                    std::cout << $2.value.character << std::endl;
-                                                    break;
-                                                    case STRING:
-                                                    std::cout << $2.value.string << std::endl;
-                                                    break;
-                                                }
-                                            }
-		| line assignment TOK_DOT_SBL	{;}
-		| line TOK_PRINT_MACRO exp TOK_DOT_SBL	{
-                                            switch($3.type)
+translation_unit    :   translation_unit 
+                    |   statement statements
+                    |   statement
+                    ;
+statement   : assignment
+            | macro
+            | block           
+            ;
+statements  : statement
+            | statements statement
+            | statements block 
+            ;
+block       : 
+            | TOK_LARROW_SBL TOK_RARROW_SBL              
+            | TOK_LARROW_SBL { std::cout << "Hello from start" << std::endl;}
+                statements
+                TOK_RARROW_SBL  { std::cout << "Hello from end" << std::endl;
+                                                            // unordered_map<std::string, symbol> contextTable;
+                                                            // contextStack.push(contextTable);
+                                                        }
+            ;
+macro       :   TOK_STDOUT_STREAM TOK_PUT_OP exp TOK_DOT_SBL{
+                                                switch($3.type)
                                                 {
                                                     case INTEGER:
                                                     std::cout << $3.value.integer << std::endl;
@@ -166,26 +167,51 @@ line    : assignment TOK_DOT_SBL		{}
                                                     std::cout << $3.value.string << std::endl;
                                                     break;
                                                 }
-                                        }
-        ;
-
-assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {   
+                                            }
+            |   TOK_STDIN_STREAM TOK_PUT_OP TOK_IDENTIFIER TOK_DOT_SBL{
+                                                auto element = symbolTable.find($3);
+                                                if(element != symbolTable.end()) {
+                                                    switch(symbolTable[$3].type)
+                                                    {
+                                                        case INTEGER:
+                                                        std::cin >> symbolTable[$3].value.integer;
+                                                        break;
+                                                        case BOOL:
+                                                        std::cin >> symbolTable[$3].value.boolean;
+                                                        break;
+                                                        case FLOAT:
+                                                        std::cin >> symbolTable[$3].value.floating_point;
+                                                        break;
+                                                        case CHARACTER:
+                                                        std::cin >> symbolTable[$3].value.character;
+                                                        break;
+                                                        case STRING:
+                                                        std::cin >> symbolTable[$3].value.string;
+                                                        break;
+                                                    }
+                                                }
+                                                else {
+                                                        yyerror("Identifier not found");
+                                                }
+            }
+            ;
+assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {   
                                                                     symbolTable[$2] = $4;
                                                                 }
-            |   TOK_FLOAT_PR TOK_IDENTIFIER  TOK_EQ_OP exp      {
+            |   TOK_FLOAT_PR TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL      {
                                                                     symbolTable[$2] = $4;
                                                                 }
-            |   TOK_BOOL_PR TOK_IDENTIFIER TOK_EQ_OP exp        {
+            |   TOK_BOOL_PR TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL        {
                                                                     symbolTable[$2] = $4;
                                                                 }
             
-            |   TOK_CHAR_PR TOK_IDENTIFIER TOK_EQ_OP exp        {
+            |   TOK_CHAR_PR TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL        {
                                                                     symbolTable[$2] = $4;
                                                                 }
-            |   TOK_STRING_PR TOK_IDENTIFIER TOK_EQ_OP exp      {
+            |   TOK_STRING_PR TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL      {
                                                                     symbolTable[$2] = $4;   
                                                                 }                                               
-            |   TOK_IDENTIFIER TOK_EQ_OP exp                      {
+            |   TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL                      {
                                                                     auto element = symbolTable.find($1);
                                                                     if(element != symbolTable.end()) {
                                                                         switch(symbolTable[$1].type)
@@ -211,7 +237,7 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
                                                                     yyerror("Identifier not found");
                                                                     }
                                                                 }
-            | TOK_IDENTIFIER TOK_SUMEQ_OP exp              {
+            | TOK_IDENTIFIER TOK_SUMEQ_OP exp TOK_DOT_SBL              {
                                                                 auto element = symbolTable.find($1);
                                                                 if(element != symbolTable.end()) {
                                                                         switch(symbolTable[$1].type)
@@ -238,7 +264,7 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
                                                                     yyerror("Identifier not found");
                                                                     }
                                                         }
-            | TOK_IDENTIFIER TOK_MINEQ_OP exp          {
+            | TOK_IDENTIFIER TOK_MINEQ_OP exp TOK_DOT_SBL          {
                                                             auto element = symbolTable.find($1);
                                                             if(element != symbolTable.end()){
                                                                         switch(symbolTable[$1].type)
@@ -265,7 +291,7 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
                                                                     yyerror("Identifier not found");
                                                                     }
                                                         }
-            | TOK_IDENTIFIER TOK_MULTEQ_OP exp           {
+            | TOK_IDENTIFIER TOK_MULTEQ_OP exp TOK_DOT_SBL           {
                                                             auto element = symbolTable.find($1);
                                                             if(element != symbolTable.end()) {
                                                                         switch(symbolTable[$1].type)
@@ -292,7 +318,7 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
                                                                     yyerror("Identifier not found");
                                                                     }
                                                         }
-            | TOK_IDENTIFIER TOK_DIVEQ_OP exp          {
+            | TOK_IDENTIFIER TOK_DIVEQ_OP exp TOK_DOT_SBL          {
                                                             auto element = symbolTable.find($1);
                                                             if(element != symbolTable.end()) {
                                                                         switch(symbolTable[$1].type)
@@ -319,7 +345,7 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp   {
                                                                     yyerror("Identifier not found");
                                                                     }
                                                         }
-            | TOK_IDENTIFIER TOK_MODEQ_OP exp           {
+            | TOK_IDENTIFIER TOK_MODEQ_OP exp TOK_DOT_SBL           {
                                                             auto element = symbolTable.find($1);
                                                             if(element != symbolTable.end()) {
                                                                         switch(symbolTable[$1].type)
