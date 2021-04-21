@@ -123,6 +123,7 @@
 %token                  TOK_STDOUT_STREAM
 %token                  TOK_STDIN_STREAM
 %token                  TOK_PRINT_MACRO
+
 %%
 line    : assignment TOK_DOT_SBL		{}
         | TOK_PRINT_MACRO exp TOK_DOT_SBL			{

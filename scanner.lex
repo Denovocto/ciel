@@ -40,7 +40,7 @@ WHITESPACE [ \t\n]+
 {INTEGER} 						{yylval.integer = atoi(yytext); return TOK_INTEGER_LIT;}	/*							LITERALS								*/
 {FLOAT} 						{yylval.floating_point = atof(yytext); return TOK_FLOAT_LIT;}
 {CHAR} 							{yylval.character = yytext[1]; return TOK_CHAR_LIT;}
-{STRING}      					{yylval.string = strdup(yytext); return TOK_STRING_LIT;}
+{STRING}      					{stripFirstAndLast(yytext); yylval.string = strdup(yytext); return TOK_STRING_LIT;}
 {BOOL}							{
 									if(strcmp(yytext, "true"))
 									{
