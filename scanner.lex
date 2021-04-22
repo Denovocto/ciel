@@ -67,6 +67,7 @@ WHITESPACE [ \t\n]+
 "do"							return TOK_DO_KEY;
 "goto"							return TOK_GOTO_KEY;
 "if"							return TOK_IF_KEY;
+"else"							return TOK_ELSE_KEY;
 "var"							return TOK_VAR_KEY;
 "ptr"							return TOK_PTR_KEY;
 
