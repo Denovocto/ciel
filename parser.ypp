@@ -5,19 +5,19 @@
     #include <math.h>
     #include <iostream>
     #include <stdlib.h>
-    #include <stack>
+    #include <vector>
 }
 %code requires {
     typedef struct symrec {
-    int type;
-    union {
-        int integer;
-        double floating_point;
-        int boolean;
-        char* string;
-        char character;
-    } value;
-} symbol;
+        int type;
+        union {
+            int integer;
+            double floating_point;
+            int boolean;
+            char* string;
+            char character;
+        } value;
+    } symbol;
 }
 %code {
     void yyerror (char *s);                   /* these are in YYlex      */
@@ -31,8 +31,7 @@
         BOOL,
         STRING
     };
-    std::unordered_map<std::string, symbol> symbolTable;
-    // std::stack<std::unordered_map<std::string, symbol> contextStack;
+    std::vector<std::unordered_map<std::string, symbol> > contextStack;
 }
 %require "3.2"
 %union
@@ -73,6 +72,7 @@
 %token					TOK_DO_KEY
 %token					TOK_GOTO_KEY
 %token					TOK_IF_KEY
+%token                  TOK_ELSE_KEY
 %token					TOK_VAR_KEY
 %token					TOK_PTR_KEY
 /*							OPERATORS								*/
@@ -119,34 +119,56 @@
 /*							IDENTIFIERS							*/
 %token<identifier>          TOK_IDENTIFIER
 %token<identifier>          TOK_LABEL_IDENTIFIER
-%token                  UNIDENTIFIED_TOKEN
+%token                      UNIDENTIFIED_TOKEN
 
 /*							MACROS						*/
 %token                  TOK_STDOUT_STREAM
 %token                  TOK_STDIN_STREAM
 %token                  TOK_PRINT_MACRO
 
+/* associativity */
+%left TOK_SUM_OP TOK_MINUS_OP TOK_MULT_OP TOK_DIV_OP
+%right TOK_EXP_OP
 %%
-translation_unit    :   translation_unit 
-                    |   statement statements
+translation_unit    :   statement statements
                     |   statement
                     ;
 statement   : assignment
             | macro
-            | block           
+            | block
+            | ifelse        
             ;
 statements  : statement
             | statements statement
-            | statements block 
-            ;
+            ; 
 block       : 
             | TOK_LARROW_SBL TOK_RARROW_SBL              
-            | TOK_LARROW_SBL { std::cout << "Hello from start" << std::endl;}
+            | TOK_LARROW_SBL                                {
+                                                                std::unordered_map<std::string, symbol> newContext;
+                                                                contextStack.push_back(newContext);
+                                                            }
                 statements
-                TOK_RARROW_SBL  { std::cout << "Hello from end" << std::endl;
-                                                            // unordered_map<std::string, symbol> contextTable;
-                                                            // contextStack.push(contextTable);
-                                                        }
+                TOK_RARROW_SBL                              {
+                                                                contextStack.pop_back();
+                                                            }
+            ;
+ifelse      :   if                                      
+            |   if else                                   
+            ;
+if          :   TOK_IF_KEY TOK_LPAR_SBL condition TOK_RPAR_SBL block  {   std::cout << "if encountered." << std::endl;   }
+            ;
+else        :   TOK_ELSE_KEY block                                 {   std::cout << "else encountered." << std::endl; }             
+            ;
+condition   :   exp
+            |   condition TOK_AND_OP exp
+            |   condition TOK_OR_OP exp
+            |   condition TOK_TEQ_OP exp
+            |   condition TOK_NEQ_OP exp
+            |   condition TOK_LEQ_OP exp
+            |   condition TOK_GEQ_OP exp
+            |   condition TOK_LESS_OP exp
+            |   condition TOK_GRTR_OP exp
+            |   TOK_LPAR_SBL condition TOK_RPAR_SBL
             ;
 macro       :   TOK_STDOUT_STREAM TOK_PUT_OP exp TOK_DOT_SBL{
                                                 switch($3.type)
@@ -168,212 +190,307 @@ macro       :   TOK_STDOUT_STREAM TOK_PUT_OP exp TOK_DOT_SBL{
                                                     break;
                                                 }
                                             }
-            |   TOK_STDIN_STREAM TOK_PUT_OP TOK_IDENTIFIER TOK_DOT_SBL{
-                                                auto element = symbolTable.find($3);
-                                                if(element != symbolTable.end()) {
-                                                    switch(symbolTable[$3].type)
-                                                    {
-                                                        case INTEGER:
-                                                        std::cin >> symbolTable[$3].value.integer;
-                                                        break;
-                                                        case BOOL:
-                                                        std::cin >> symbolTable[$3].value.boolean;
-                                                        break;
-                                                        case FLOAT:
-                                                        std::cin >> symbolTable[$3].value.floating_point;
-                                                        break;
-                                                        case CHARACTER:
-                                                        std::cin >> symbolTable[$3].value.character;
-                                                        break;
-                                                        case STRING:
-                                                        std::cin >> symbolTable[$3].value.string;
-                                                        break;
-                                                    }
-                                                }
-                                                else {
-                                                        yyerror("Identifier not found");
-                                                }
-            }
+            |   TOK_STDIN_STREAM TOK_PUT_OP TOK_IDENTIFIER TOK_DOT_SBL  {
+                                                                            int numTables = contextStack.size();
+                                                                            int count = 0;
+                                                                            for(auto symbolTable : contextStack)
+                                                                            {
+                                                                                auto element = symbolTable.find($3);
+                                                                                if(element != symbolTable.end()) {
+                                                                                    switch(symbolTable[$3].type)
+                                                                                    {
+                                                                                        case INTEGER:
+                                                                                        std::cin >> symbolTable[$3].value.integer;
+                                                                                        break;
+                                                                                        case BOOL:
+                                                                                        std::cin >> symbolTable[$3].value.boolean;
+                                                                                        break;
+                                                                                        case FLOAT:
+                                                                                        std::cin >> symbolTable[$3].value.floating_point;
+                                                                                        break;
+                                                                                        case CHARACTER:
+                                                                                        std::cin >> symbolTable[$3].value.character;
+                                                                                        break;
+                                                                                        case STRING:
+                                                                                        std::cin >> symbolTable[$3].value.string;
+                                                                                        break;
+                                                                                    }
+                                                                                    break;
+                                                                                }
+                                                                                else {
+                                                                                        count++;
+                                                                                }
+                                                                            }
+                                                                            if (count == numTables){
+                                                                                yyerror("Identifier not found");
+                                                                                exit(1);
+                                                                            }
+                                                                        }
             ;
-assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {   
-                                                                    symbolTable[$2] = $4;
-                                                                }
+assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {
+                                                                                if(contextStack.empty()){
+                                                                                    std::unordered_map<std::string, symbol> globalTable;
+                                                                                    contextStack.push_back(globalTable);
+                                                                                }
+                                                                                contextStack.back()[$2] = $4;
+                                                                            }
             |   TOK_FLOAT_PR TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL      {
-                                                                    symbolTable[$2] = $4;
-                                                                }
+                                                                                if(contextStack.empty()){
+                                                                                    std::unordered_map<std::string, symbol> globalTable;
+                                                                                    contextStack.push_back(globalTable);
+                                                                                }
+                                                                                contextStack.back()[$2] = $4;
+                                                                            }
             |   TOK_BOOL_PR TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL        {
-                                                                    symbolTable[$2] = $4;
-                                                                }
+                                                                                if(contextStack.empty()){
+                                                                                    std::unordered_map<std::string, symbol> globalTable;
+                                                                                    contextStack.push_back(globalTable);
+                                                                                }
+                                                                                contextStack.back()[$2] = $4;
+                                                                            }
             
             |   TOK_CHAR_PR TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL        {
-                                                                    symbolTable[$2] = $4;
-                                                                }
+                                                                                if(contextStack.empty()){
+                                                                                    std::unordered_map<std::string, symbol> globalTable;
+                                                                                    contextStack.push_back(globalTable);
+                                                                                }
+                                                                                contextStack.back()[$2] = $4;
+                                                                            }
             |   TOK_STRING_PR TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL      {
-                                                                    symbolTable[$2] = $4;   
-                                                                }                                               
-            |   TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL                      {
-                                                                    auto element = symbolTable.find($1);
-                                                                    if(element != symbolTable.end()) {
-                                                                        switch(symbolTable[$1].type)
-                                                                        {
-                                                                            case INTEGER:
-                                                                            symbolTable[$1].value.integer = $3.value.integer;
-                                                                            break;
-                                                                            case BOOL:
-                                                                            symbolTable[$1].value.boolean = $3.value.boolean;
-                                                                            break;
-                                                                            case FLOAT:
-                                                                            symbolTable[$1].value.floating_point = $3.value.floating_point;
-                                                                            break;
-                                                                            case CHARACTER:
-                                                                            symbolTable[$1].value.character = $3.value.character;
-                                                                            break;
-                                                                            case STRING:
-                                                                            symbolTable[$1].value.string = $3.value.string;
-                                                                            break;
-                                                                        }
-                                                                    }
-                                                                    else {
-                                                                    yyerror("Identifier not found");
-                                                                    }
-                                                                }
-            | TOK_IDENTIFIER TOK_SUMEQ_OP exp TOK_DOT_SBL              {
-                                                                auto element = symbolTable.find($1);
-                                                                if(element != symbolTable.end()) {
-                                                                        switch(symbolTable[$1].type)
-                                                                        {
-                                                                            case INTEGER:
-                                                                            symbolTable[$1].value.integer += $3.value.integer;
-                                                                            break;
-                                                                            case BOOL:
-                                                                            symbolTable[$1].value.boolean += $3.value.boolean;
-                                                                            break;
-                                                                            case FLOAT:
-                                                                            symbolTable[$1].value.floating_point += $3.value.floating_point;
-                                                                            break;
-                                                                            case CHARACTER:
-                                                                            symbolTable[$1].value.character += $3.value.character;
-                                                                            break;
-                                                                            case STRING:
-                                                                            yyerror("cannot sum and equal to string");
-                                                                            exit(1);
-                                                                            break;
-                                                                        }
-                                                                    }
-                                                                    else {
-                                                                    yyerror("Identifier not found");
-                                                                    }
-                                                        }
-            | TOK_IDENTIFIER TOK_MINEQ_OP exp TOK_DOT_SBL          {
-                                                            auto element = symbolTable.find($1);
-                                                            if(element != symbolTable.end()){
-                                                                        switch(symbolTable[$1].type)
-                                                                        {
-                                                                            case INTEGER:
-                                                                            symbolTable[$1].value.integer -= $3.value.integer;
-                                                                            break;
-                                                                            case BOOL:
-                                                                            symbolTable[$1].value.boolean -= $3.value.boolean;
-                                                                            break;
-                                                                            case FLOAT:
-                                                                            symbolTable[$1].value.floating_point -= $3.value.floating_point;
-                                                                            break;
-                                                                            case CHARACTER:
-                                                                            symbolTable[$1].value.character -= $3.value.character;
-                                                                            break;
-                                                                            case STRING:
-                                                                            yyerror("cannot minus and equal to string");
-                                                                            exit(1);
-                                                                            break;
-                                                                        }
-                                                                    }
-                                                                    else {
-                                                                    yyerror("Identifier not found");
-                                                                    }
-                                                        }
-            | TOK_IDENTIFIER TOK_MULTEQ_OP exp TOK_DOT_SBL           {
-                                                            auto element = symbolTable.find($1);
-                                                            if(element != symbolTable.end()) {
-                                                                        switch(symbolTable[$1].type)
-                                                                        {
-                                                                            case INTEGER:
-                                                                            symbolTable[$1].value.integer *= $3.value.integer;
-                                                                            break;
-                                                                            case BOOL:
-                                                                            symbolTable[$1].value.boolean *= $3.value.boolean;
-                                                                            break;
-                                                                            case FLOAT:
-                                                                            symbolTable[$1].value.floating_point *= $3.value.floating_point;
-                                                                            break;
-                                                                            case CHARACTER:
-                                                                            symbolTable[$1].value.character *= $3.value.character;
-                                                                            break;
-                                                                            case STRING:
-                                                                            yyerror("cannot multiply and equal to string");
-                                                                            exit(1);
-                                                                            break;
-                                                                        }
-                                                                    }
-                                                                    else {
-                                                                    yyerror("Identifier not found");
-                                                                    }
-                                                        }
-            | TOK_IDENTIFIER TOK_DIVEQ_OP exp TOK_DOT_SBL          {
-                                                            auto element = symbolTable.find($1);
-                                                            if(element != symbolTable.end()) {
-                                                                        switch(symbolTable[$1].type)
-                                                                        {
-                                                                            case INTEGER:
-                                                                            symbolTable[$1].value.integer /= $3.value.integer;
-                                                                            break;
-                                                                            case BOOL:
-                                                                            symbolTable[$1].value.boolean /= $3.value.boolean;
-                                                                            break;
-                                                                            case FLOAT:
-                                                                            symbolTable[$1].value.floating_point /= $3.value.floating_point;
-                                                                            break;
-                                                                            case CHARACTER:
-                                                                            symbolTable[$1].value.character /= $3.value.character;
-                                                                            break;
-                                                                            case STRING:
-                                                                            yyerror("cannot divide and equal to string");
-                                                                            exit(1);
-                                                                            break;
-                                                                        }
-                                                                    }
-                                                                    else {
-                                                                    yyerror("Identifier not found");
-                                                                    }
-                                                        }
-            | TOK_IDENTIFIER TOK_MODEQ_OP exp TOK_DOT_SBL           {
-                                                            auto element = symbolTable.find($1);
-                                                            if(element != symbolTable.end()) {
-                                                                        switch(symbolTable[$1].type)
-                                                                        {
-                                                                            case INTEGER:
-                                                                            symbolTable[$1].value.integer %= $3.value.integer;
-                                                                            break;
-                                                                            case BOOL:
-                                                                            symbolTable[$1].value.boolean %= $3.value.boolean;
-                                                                            break;
-                                                                            case FLOAT:
-                                                                            yyerror("cannot modulus and equal to double");
-                                                                            exit(1);
-                                                                            break;
-                                                                            case CHARACTER:
-                                                                            symbolTable[$1].value.character %= $3.value.character;
-                                                                            break;
-                                                                            case STRING:
-                                                                            yyerror("cannot modulus and equal to string");
-                                                                            exit(1);
-                                                                            break;
-                                                                        }
-                                                                    }
-                                                                    else {
-                                                                    yyerror("Identifier not found");
-                                                                    }
-                                                        }                                                                                                                                 
-		   ;
+                                                                                if(contextStack.empty()){
+                                                                                    std::unordered_map<std::string, symbol> globalTable;
+                                                                                    contextStack.push_back(globalTable);
+                                                                                }
+                                                                                contextStack.back()[$2] = $4;   
+                                                                            }                                               
+            |   TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL                    {
+                                                                                int numTables = contextStack.size();
+                                                                                int count = 0;
+                                                                                for (auto symbolTable : contextStack)
+                                                                                {
+                                                                                    std::cout << "[ ";
+                                                                                    for (auto element : symbolTable)
+                                                                                        std::cout << element.first << " ";
+                                                                                    std::cout << "]" << std::endl;
+                                                                                    auto element = symbolTable.find($1);
+                                                                                    if(element != symbolTable.end()) {
+                                                                                        switch(symbolTable[$1].type)
+                                                                                        {
+                                                                                            case INTEGER:
+                                                                                            symbolTable[$1].value.integer = $3.value.integer;
+                                                                                            break;
+                                                                                            case BOOL:
+                                                                                            symbolTable[$1].value.boolean = $3.value.boolean;
+                                                                                            break;
+                                                                                            case FLOAT:
+                                                                                            symbolTable[$1].value.floating_point = $3.value.floating_point;
+                                                                                            break;
+                                                                                            case CHARACTER:
+                                                                                            symbolTable[$1].value.character = $3.value.character;
+                                                                                            break;
+                                                                                            case STRING:
+                                                                                            symbolTable[$1].value.string = $3.value.string;
+                                                                                            break;
+                                                                                        }
+                                                                                        break;
+                                                                                    }
+                                                                                    else{
+                                                                                        count++;
+                                                                                    }
+                                                                                }
+                                                                                if (count == numTables){
+                                                                                    yyerror("Identifier not found");
+                                                                                    exit(1);
+                                                                                }
+                                                                            }
+            | TOK_IDENTIFIER TOK_SUMEQ_OP exp TOK_DOT_SBL                   {
+                                                                                int numTables = contextStack.size();
+                                                                                int count = 0;
+                                                                                for (auto symbolTable : contextStack)
+                                                                                {
+                                                                                    auto element = symbolTable.find($1);
+                                                                                    if(element != symbolTable.end()) {
+                                                                                        switch(symbolTable[$1].type)
+                                                                                        {
+                                                                                            case INTEGER:
+                                                                                            symbolTable[$1].value.integer += $3.value.integer;
+                                                                                            break;
+                                                                                            case BOOL:
+                                                                                            symbolTable[$1].value.boolean += $3.value.boolean;
+                                                                                            break;
+                                                                                            case FLOAT:
+                                                                                            symbolTable[$1].value.floating_point += $3.value.floating_point;
+                                                                                            break;
+                                                                                            case CHARACTER:
+                                                                                            symbolTable[$1].value.character += $3.value.character;
+                                                                                            break;
+                                                                                            case STRING:
+                                                                                            yyerror("cannot sum and equal to string");
+                                                                                            exit(1);
+                                                                                            break;
+                                                                                        }
+                                                                                        break;
+                                                                                    }
+                                                                                    else{
+                                                                                        count++;
+                                                                                    }
+                                                                                }
+                                                                                if (count == numTables){
+                                                                                    yyerror("Identifier not found");
+                                                                                    exit(1);
+                                                                                }
+                                                                            }
+            | TOK_IDENTIFIER TOK_MINEQ_OP exp TOK_DOT_SBL                   {
+                                                                                int numTables = contextStack.size();
+                                                                                int count = 0;
+                                                                                for (auto symbolTable : contextStack)
+                                                                                {
+                                                                                    auto element = symbolTable.find($1);
+                                                                                    if(element != symbolTable.end()){
+                                                                                        switch(symbolTable[$1].type)
+                                                                                        {
+                                                                                            case INTEGER:
+                                                                                            symbolTable[$1].value.integer -= $3.value.integer;
+                                                                                            break;
+                                                                                            case BOOL:
+                                                                                            symbolTable[$1].value.boolean -= $3.value.boolean;
+                                                                                            break;
+                                                                                            case FLOAT:
+                                                                                            symbolTable[$1].value.floating_point -= $3.value.floating_point;
+                                                                                            break;
+                                                                                            case CHARACTER:
+                                                                                            symbolTable[$1].value.character -= $3.value.character;
+                                                                                            break;
+                                                                                            case STRING:
+                                                                                            yyerror("cannot minus and equal to string");
+                                                                                            exit(1);
+                                                                                            break;
+                                                                                        }
+                                                                                        break;
+                                                                                    }
+                                                                                     else{
+                                                                                        count++;
+                                                                                    }
+                                                                                }
+                                                                                if (count == numTables){
+                                                                                    yyerror("Identifier not found");
+                                                                                    exit(1);
+                                                                                }
+                                                                            }
+            | TOK_IDENTIFIER TOK_MULTEQ_OP exp TOK_DOT_SBL                  {
+                                                                                int numTables = contextStack.size();
+                                                                                int count = 0;
+                                                                                for (auto symbolTable : contextStack)
+                                                                                {
+                                                                                    auto element = symbolTable.find($1);
+                                                                                    if(element != symbolTable.end()) {
+                                                                                        switch(symbolTable[$1].type)
+                                                                                        {
+                                                                                            case INTEGER:
+                                                                                            symbolTable[$1].value.integer *= $3.value.integer;
+                                                                                            break;
+                                                                                            case BOOL:
+                                                                                            symbolTable[$1].value.boolean *= $3.value.boolean;
+                                                                                            break;
+                                                                                            case FLOAT:
+                                                                                            symbolTable[$1].value.floating_point *= $3.value.floating_point;
+                                                                                            break;
+                                                                                            case CHARACTER:
+                                                                                            symbolTable[$1].value.character *= $3.value.character;
+                                                                                            break;
+                                                                                            case STRING:
+                                                                                            yyerror("cannot multiply and equal to string");
+                                                                                            exit(1);
+                                                                                            break;
+                                                                                        }
+                                                                                        break;
+                                                                                    }
+                                                                                     else{
+                                                                                        count++;
+                                                                                    }
+                                                                                }
+                                                                                if (count == numTables){
+                                                                                    yyerror("Identifier not found");
+                                                                                    exit(1);
+                                                                                }
+                                                                                
+                                                                            }
+            | TOK_IDENTIFIER TOK_DIVEQ_OP exp TOK_DOT_SBL                   {
+                                                                                int numTables = contextStack.size();
+                                                                                int count = 0;
+                                                                                for (auto symbolTable : contextStack)
+                                                                                {
+                                                                                    auto element = symbolTable.find($1);
+                                                                                    if(element != symbolTable.end()) {
+                                                                                        switch(symbolTable[$1].type)
+                                                                                        {
+                                                                                            case INTEGER:
+                                                                                            symbolTable[$1].value.integer /= $3.value.integer;
+                                                                                            break;
+                                                                                            case BOOL:
+                                                                                            symbolTable[$1].value.boolean /= $3.value.boolean;
+                                                                                            break;
+                                                                                            case FLOAT:
+                                                                                            symbolTable[$1].value.floating_point /= $3.value.floating_point;
+                                                                                            break;
+                                                                                            case CHARACTER:
+                                                                                            symbolTable[$1].value.character /= $3.value.character;
+                                                                                            break;
+                                                                                            case STRING:
+                                                                                            yyerror("cannot divide and equal to string");
+                                                                                            exit(1);
+                                                                                            break;
+                                                                                        }
+                                                                                        break;
+                                                                                    }
+                                                                                    else{
+                                                                                        count++;
+                                                                                    }
+                                                                                }
+                                                                                if (count == numTables){
+                                                                                    yyerror("Identifier not found"); 
+                                                                                    exit(1);
+                                                                                }    
+                                                                            }
+            | TOK_IDENTIFIER TOK_MODEQ_OP exp TOK_DOT_SBL                   {
+                                                                                int numTables = contextStack.size();
+                                                                                int count = 0;
+                                                                                for (auto symbolTable : contextStack)
+                                                                                {
+                                                                                    auto element = symbolTable.find($1);
+                                                                                    if(element != symbolTable.end()) {
+                                                                                        switch(symbolTable[$1].type)
+                                                                                        {
+                                                                                            case INTEGER:
+                                                                                            symbolTable[$1].value.integer %= $3.value.integer;
+                                                                                            break;
+                                                                                            case BOOL:
+                                                                                            symbolTable[$1].value.boolean %= $3.value.boolean;
+                                                                                            break;
+                                                                                            case FLOAT:
+                                                                                            yyerror("cannot modulus and equal to double");
+                                                                                            exit(1);
+                                                                                            break;
+                                                                                            case CHARACTER:
+                                                                                            symbolTable[$1].value.character %= $3.value.character;
+                                                                                            break;
+                                                                                            case STRING:
+                                                                                            yyerror("cannot modulus and equal to string");
+                                                                                            exit(1);
+                                                                                            break;
+                                                                                        }
+                                                                                        break;
+                                                                                    }
+                                                                                    else{
+                                                                                        count++;
+                                                                                    }
+                                                                                }
+                                                                                if (count == numTables){
+                                                                                    yyerror("Identifier not found");
+                                                                                    exit(1);
+                                                                                }
+                                                                            }                                                                                                                                 
+		    ;
 
 exp    	: term                          {
                                             switch($1.type)
@@ -400,7 +517,7 @@ exp    	: term                          {
                                                 break;
                                             }
                                         }
-       	| exp TOK_SUM_OP term          {
+       	| exp TOK_SUM_OP term           {
                                             switch($3.type)
                                             {
                                                 case INTEGER:
@@ -452,7 +569,7 @@ exp    	: term                          {
                                             }
                                         }
 	    | exp TOK_MULT_OP term          {
-                                         switch($3.type)
+                                            switch($3.type)
                                             {
                                                 case INTEGER:
                                                 $$.type = INTEGER;
@@ -476,7 +593,7 @@ exp    	: term                          {
                                                 break; 
                                             }
                                         }
-	    | exp TOK_DIV_OP term          {
+	    | exp TOK_DIV_OP term           {
                                             switch($3.type)
                                             {
                                                 case INTEGER:
@@ -500,7 +617,7 @@ exp    	: term                          {
                                                 exit(1);
                                                 break; 
                                             }
-        } 
+                                        } 
         | exp TOK_MOD_OP term          {
                                             switch($3.type)
                                             {
@@ -525,7 +642,7 @@ exp    	: term                          {
                                                 exit(1);
                                                 break; 
                                             }
-        }
+                                        }
         | exp TOK_EXP_OP term          {
                                             switch($3.type)
                                             {
@@ -551,7 +668,7 @@ exp    	: term                          {
                                                 break; 
                                             }
                                         }
-        | TOK_LPAR_SBL exp TOK_RPAR_SBL                       {
+        | TOK_LPAR_SBL exp TOK_RPAR_SBL     {
                                                 switch($2.type)
                                                 {
                                                     case INTEGER:
@@ -577,7 +694,6 @@ exp    	: term                          {
                                                 }
                                             }
         ;
-
 term   	    : TOK_INTEGER_LIT               {  
                                                 $$.type = INTEGER;
                                                 $$.value.integer = $1;
@@ -585,52 +701,60 @@ term   	    : TOK_INTEGER_LIT               {
             | TOK_FLOAT_LIT                 {
                                                 $$.type = FLOAT;
                                                 $$.value.floating_point = $1;
-                                            }    
-                                            
+                                            }
             | TOK_STRING_LIT                {
                                                 $$.type = STRING;
                                                 $$.value.string = $1;
                                             }
-		    | TOK_CHAR_LIT                   {
+		    | TOK_CHAR_LIT                  {
                                                 $$.type = CHARACTER;
                                                 $$.value.character = $1;
                                             }
-            | TOK_BOOL_LIT                   {
+            | TOK_BOOL_LIT                  {
                                                 $$.type = BOOL;
                                                 $$.value.boolean = $1;
                                             }
-            | TOK_IDENTIFIER		{
-                                        auto element = symbolTable.find($1);
-                                        if(element != symbolTable.end()){
-                                            switch(symbolTable[$1].type)
-                                            {
-                                                case INTEGER:
-                                                $$.type = INTEGER;
-                                                $$.value.integer = symbolTable[$1].value.integer;
-                                                break;
-                                                case BOOL:
-                                                $$.type = BOOL;
-                                                $$.value.boolean = symbolTable[$1].value.boolean;
-                                                break;
-                                                case FLOAT:
-                                                $$.type = FLOAT;
-                                                $$.value.floating_point = symbolTable[$1].value.floating_point ;
-                                                break;
-                                                case CHARACTER:
-                                                $$.type = CHARACTER;
-                                                $$.value.character = symbolTable[$1].value.character;
-                                                break;
-                                                case STRING:
-                                                $$.type = STRING;
-                                                $$.value.string = symbolTable[$1].value.string;
-                                                break;
-                                            }
-                                        }
-                                        else{
-                                            yyerror("Var doesn't exist!");
-                                            exit(0);
-                                        }
-								 	}
+            | TOK_IDENTIFIER		        {
+                                                int numTables = contextStack.size();
+                                                int count = 0;
+                                                for(auto symbolTable : contextStack)
+                                                {
+                                                    auto element = symbolTable.find($1);
+                                                    if(element != symbolTable.end()){
+                                                        switch(symbolTable[$1].type)
+                                                        {
+                                                            case INTEGER:
+                                                            $$.type = INTEGER;
+                                                            $$.value.integer = symbolTable[$1].value.integer;
+                                                            break;
+                                                            case BOOL:
+                                                            $$.type = BOOL;
+                                                            $$.value.boolean = symbolTable[$1].value.boolean;
+                                                            break;
+                                                            case FLOAT:
+                                                            $$.type = FLOAT;
+                                                            $$.value.floating_point = symbolTable[$1].value.floating_point ;
+                                                            break;
+                                                            case CHARACTER:
+                                                            $$.type = CHARACTER;
+                                                            $$.value.character = symbolTable[$1].value.character;
+                                                            break;
+                                                            case STRING:
+                                                            $$.type = STRING;
+                                                            $$.value.string = symbolTable[$1].value.string;
+                                                            break;
+                                                        }
+                                                        break;
+                                                    }
+                                                    else{
+                                                        count++;
+                                                    }
+                                                }
+                                                if (count == numTables){
+                                                    yyerror("Identifier not found");
+                                                    exit(1);
+                                                }
+								 	        }
         ;
 %%
 
