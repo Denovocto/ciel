@@ -12,7 +12,7 @@ The Ciel programming language is a statically typed, generic and structured prog
 The main purpose of this Ciel programming language is to remove all unnecessary complexity and maximize developer efficiency. The language also helps to produce clean and consistent applications which can be easily read and understood, making usability one of it strongest features. Ciel programming language is written using C and C++ as its base.
 
 # Motivation
-The main motivation behind the Ciel programming language is to explore interesting ideas and introduce them to the programming community in a fresh and simple manner such that it will prove to be fun and intuitive to work on. This is the reason why the Ciel team decided to create a language in which its syntax will be more clear and precise, because it will bring another interesting way of interacting and interfacing with a computer system in a much personalized or stylish way. Therefore, Ciel will bring a more comfortable and orderly feel to its users.
+The main motivation behind the Ciel programming language is to explore interesting ideas and introduce them to the programming community in a fresh and simple manner such that it will prove to be pleasant and intuitive to work on. This is the reason why the Ciel team decided to create a language in which its syntax will be more clear and precise, because it will bring another interesting way of interacting and interfacing with a computer system in a much personalized or stylish way. Therefore, Ciel brings a more comfortable and orderly feel to its users.
 
 # Technologies 
 * C and C++ programming languages
