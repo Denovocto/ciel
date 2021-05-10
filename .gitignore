@@ -38,6 +38,7 @@
 *.app
 
 # Our own
+ciel
 ciel_scanner
 .DS_Store
 *.swp
