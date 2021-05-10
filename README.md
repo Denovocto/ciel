@@ -19,20 +19,20 @@ The main motivation behind the Ciel programming language is to explore interesti
 * Lex/Flex as a scanner generator in C
 * Yacc/Bison as a parser generator in C++
 
-# Compiling
-To use Ciel, you can run it locally by using the makefile and then executing the executable file:
-```
-make
-./ciel_scanner
-```
-This will let you use Ciel as a type of interpreted language.
-
-If you want to compile and run a file written in Ciel language, you will run it as we previously did but adding the file's name next to the exe file as following:
-```
-make
-./ciel_scanner example.ci
-```
-
+# Compiling the language
+Before compiling the language you must make sure that your system meets all of the requirements and dependancies.
+To use the Ciel language interpreter, you must first compile its executable.
+To built the ciel executable, use make like so:
+`make`
+# Running the ciel interpreter
+There are two main ways of using the ciel interpreter.
+* Using it interactively
+* Using it on a file
+## Using the ciel interpreter interactively
+Once, you have compiled the ciel interpreter successfully, you may run it interactively by just running the executable on its own withou tpassing any arguments to it. Like so: `./ciel`
+## Using the ciel interpreter on a file
+To use the ciel interpreter to interpret a file, you just pass the filename as an argument to the ciel executable. Like so:
+`./ciel <filename>`
 # Example Code
 You can check out an example of a simple Hello World program written in Ciel language here: 
 [Example Program](https://github.com/Denovocto/ciel/blob/master/example.cl)

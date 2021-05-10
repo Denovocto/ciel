@@ -5,7 +5,7 @@ LEX=flex
 YACC=bison
 LEX_SOURCE=scanner.lex
 YACC_SOURCE=parser.ypp
-EXECUTABLE_NAME=ciel_scanner
+EXECUTABLE_NAME=ciel
 
 all: lexxer parser scanner_exe executable
 lexxer: $(LEX_SOURCE)
