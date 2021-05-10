@@ -193,7 +193,7 @@ macro       :   TOK_STDOUT_STREAM TOK_PUT_OP exp TOK_DOT_SBL{
             |   TOK_STDIN_STREAM TOK_PUT_OP TOK_IDENTIFIER TOK_DOT_SBL  {
                                                                             int numTables = contextStack.size();
                                                                             int count = 0;
-                                                                            for(auto symbolTable : contextStack)
+                                                                            for(auto&& symbolTable : contextStack)
                                                                             {
                                                                                 auto element = symbolTable.find($3);
                                                                                 if(element != symbolTable.end()) {
@@ -721,6 +721,7 @@ term   	    : TOK_INTEGER_LIT               {
                                                 {
                                                     auto element = symbolTable.find($1);
                                                     if(element != symbolTable.end()){
+                                                        // std::cout << "Found identifier: " << $1 << " " << symbolTable[$1].value.integer << std::endl;
                                                         switch(symbolTable[$1].type)
                                                         {
                                                             case INTEGER:
