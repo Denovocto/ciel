@@ -74,7 +74,6 @@
 %token					TOK_IF_KEY
 %token                  TOK_ELSE_KEY
 %token					TOK_VAR_KEY
-%token					TOK_PTR_KEY
 /*							OPERATORS								*/
 %token					TOK_SUMEQ_OP
 %token					TOK_MINEQ_OP
@@ -124,7 +123,6 @@
 /*							MACROS						*/
 %token                  TOK_STDOUT_STREAM
 %token                  TOK_STDIN_STREAM
-%token                  TOK_PRINT_MACRO
 
 /* associativity */
 %left TOK_SUM_OP TOK_MINUS_OP TOK_MULT_OP TOK_DIV_OP
@@ -136,7 +134,12 @@ translation_unit    :   statement statements
 statement   : assignment
             | macro
             | block
-            | ifelse        
+            | ifelse
+            | while
+            | until
+            | dowhile
+            | TOK_LABEL_IDENTIFIER      {std::cout << "label encountered at: " << yylineno << std::endl;}
+            | TOK_GOTO_KEY TOK_IDENTIFIER TOK_DOT_SBL        {std::cout << "GOTO encountered at: " << yylineno << std::endl;}
             ;
 statements  : statement
             | statements statement
@@ -152,6 +155,12 @@ block       :
                                                                 contextStack.pop_back();
                                                             }
             ;
+while       :   TOK_WHILE_KEY TOK_LPAR_SBL condition TOK_RPAR_SBL   block   {   std::cout << "while encountered." << std::endl; }
+            ;
+until       :   TOK_UNTIL_KEY TOK_LPAR_SBL condition TOK_RPAR_SBL   block   {   std::cout << "until encountered." << std::endl; }
+            ;
+dowhile     :   TOK_DO_KEY  block   TOK_WHILE_KEY TOK_LPAR_SBL condition TOK_RPAR_SBL TOK_DOT_SBL  { std::cout << "do while encountered." << std::endl; }
+            ;
 ifelse      :   if                                      
             |   if else                                   
             ;
@@ -159,7 +168,8 @@ if          :   TOK_IF_KEY TOK_LPAR_SBL condition TOK_RPAR_SBL block  {   std::c
             ;
 else        :   TOK_ELSE_KEY block                                 {   std::cout << "else encountered." << std::endl; }             
             ;
-condition   :   exp
+condition   :   TOK_NOT_OP  exp    %prec TOK_NOT_OP
+            |   exp
             |   condition TOK_AND_OP exp
             |   condition TOK_OR_OP exp
             |   condition TOK_TEQ_OP exp
@@ -227,19 +237,52 @@ macro       :   TOK_STDOUT_STREAM TOK_PUT_OP exp TOK_DOT_SBL{
                                                                             }
                                                                         }
             ;
-assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {
+assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_DOT_SBL                 {
+                                                                                if(contextStack.empty()){
+                                                                                    std::unordered_map<std::string, symbol> globalTable;
+                                                                                    contextStack.push_back(globalTable);
+                                                                                }
+                                                                                symrec* toBeAdded = new symrec();
+                                                                                toBeAdded->type = INTEGER;
+                                                                                toBeAdded->value.integer = 0;
+                                                                                contextStack.back()[$2] = *toBeAdded;
+                                                                                delete toBeAdded;
+                                                                            }
+            |   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {
                                                                                 if(contextStack.empty()){
                                                                                     std::unordered_map<std::string, symbol> globalTable;
                                                                                     contextStack.push_back(globalTable);
                                                                                 }
                                                                                 contextStack.back()[$2] = $4;
                                                                             }
-            |   TOK_FLOAT_PR TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL      {
+            |   TOK_FLOAT_PR    TOK_IDENTIFIER TOK_DOT_SBL                  {
+                                                                                if(contextStack.empty()){
+                                                                                    std::unordered_map<std::string, symbol> globalTable;
+                                                                                    contextStack.push_back(globalTable);
+                                                                                }
+                                                                                symrec* toBeAdded = new symrec();
+                                                                                toBeAdded->type = FLOAT;
+                                                                                toBeAdded->value.floating_point = 0.0;
+                                                                                contextStack.back()[$2] = *toBeAdded;
+                                                                                delete toBeAdded;
+                                                                            } 
+            |   TOK_FLOAT_PR    TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL      {
                                                                                 if(contextStack.empty()){
                                                                                     std::unordered_map<std::string, symbol> globalTable;
                                                                                     contextStack.push_back(globalTable);
                                                                                 }
                                                                                 contextStack.back()[$2] = $4;
+                                                                            }
+            |   TOK_BOOL_PR     TOK_IDENTIFIER TOK_DOT_SBL                  {
+                                                                                if(contextStack.empty()){
+                                                                                    std::unordered_map<std::string, symbol> globalTable;
+                                                                                    contextStack.push_back(globalTable);
+                                                                                }
+                                                                                symrec* toBeAdded = new symrec();
+                                                                                toBeAdded->type = BOOL;
+                                                                                toBeAdded->value.boolean = 0;
+                                                                                contextStack.back()[$2] = *toBeAdded;
+                                                                                delete toBeAdded;
                                                                             }
             |   TOK_BOOL_PR TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL        {
                                                                                 if(contextStack.empty()){
@@ -248,13 +291,34 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {
                                                                                 }
                                                                                 contextStack.back()[$2] = $4;
                                                                             }
-            
+            |   TOK_CHAR_PR TOK_IDENTIFIER  TOK_DOT_SBL                     {
+                                                                                if(contextStack.empty()){
+                                                                                    std::unordered_map<std::string, symbol> globalTable;
+                                                                                    contextStack.push_back(globalTable);
+                                                                                }
+                                                                                symrec* toBeAdded = new symrec();
+                                                                                toBeAdded->type = CHARACTER;
+                                                                                toBeAdded->value.character = '\0';
+                                                                                contextStack.back()[$2] = *toBeAdded;
+                                                                                delete toBeAdded;
+                                                                            }
             |   TOK_CHAR_PR TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL        {
                                                                                 if(contextStack.empty()){
                                                                                     std::unordered_map<std::string, symbol> globalTable;
                                                                                     contextStack.push_back(globalTable);
                                                                                 }
                                                                                 contextStack.back()[$2] = $4;
+                                                                            }
+            |   TOK_STRING_PR TOK_IDENTIFIER TOK_DOT_SBL                    {
+                                                                                if(contextStack.empty()){
+                                                                                    std::unordered_map<std::string, symbol> globalTable;
+                                                                                    contextStack.push_back(globalTable);
+                                                                                }
+                                                                                symrec* toBeAdded = new symrec();
+                                                                                toBeAdded->type = STRING;
+                                                                                toBeAdded->value.string = "";
+                                                                                contextStack.back()[$2] = *toBeAdded;
+                                                                                delete toBeAdded;
                                                                             }
             |   TOK_STRING_PR TOK_IDENTIFIER TOK_EQ_OP exp TOK_DOT_SBL      {
                                                                                 if(contextStack.empty()){
@@ -306,7 +370,7 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {
             | TOK_IDENTIFIER TOK_SUMEQ_OP exp TOK_DOT_SBL                   {
                                                                                 int numTables = contextStack.size();
                                                                                 int count = 0;
-                                                                                for (auto symbolTable : contextStack)
+                                                                                for (auto&& symbolTable : contextStack)
                                                                                 {
                                                                                     auto element = symbolTable.find($1);
                                                                                     if(element != symbolTable.end()) {
@@ -343,7 +407,7 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {
             | TOK_IDENTIFIER TOK_MINEQ_OP exp TOK_DOT_SBL                   {
                                                                                 int numTables = contextStack.size();
                                                                                 int count = 0;
-                                                                                for (auto symbolTable : contextStack)
+                                                                                for (auto&& symbolTable : contextStack)
                                                                                 {
                                                                                     auto element = symbolTable.find($1);
                                                                                     if(element != symbolTable.end()){
@@ -380,7 +444,7 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {
             | TOK_IDENTIFIER TOK_MULTEQ_OP exp TOK_DOT_SBL                  {
                                                                                 int numTables = contextStack.size();
                                                                                 int count = 0;
-                                                                                for (auto symbolTable : contextStack)
+                                                                                for (auto&& symbolTable : contextStack)
                                                                                 {
                                                                                     auto element = symbolTable.find($1);
                                                                                     if(element != symbolTable.end()) {
@@ -418,7 +482,7 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {
             | TOK_IDENTIFIER TOK_DIVEQ_OP exp TOK_DOT_SBL                   {
                                                                                 int numTables = contextStack.size();
                                                                                 int count = 0;
-                                                                                for (auto symbolTable : contextStack)
+                                                                                for (auto&& symbolTable : contextStack)
                                                                                 {
                                                                                     auto element = symbolTable.find($1);
                                                                                     if(element != symbolTable.end()) {
@@ -455,7 +519,7 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {
             | TOK_IDENTIFIER TOK_MODEQ_OP exp TOK_DOT_SBL                   {
                                                                                 int numTables = contextStack.size();
                                                                                 int count = 0;
-                                                                                for (auto symbolTable : contextStack)
+                                                                                for (auto&& symbolTable : contextStack)
                                                                                 {
                                                                                     auto element = symbolTable.find($1);
                                                                                     if(element != symbolTable.end()) {
@@ -492,7 +556,32 @@ assignment  :   TOK_INTEGER_PR  TOK_IDENTIFIER  TOK_EQ_OP exp TOK_DOT_SBL   {
                                                                             }                                                                                                                                 
 		    ;
 
-exp    	: term                          {
+exp    	:   TOK_MINUS_OP term       %prec TOK_MINUS_OP     {
+                                            switch($2.type)
+                                            {
+                                                case INTEGER:
+                                                $$.type = INTEGER;
+                                                $$.value.integer = -$2.value.integer;
+                                                break;
+                                                case BOOL:
+                                                $$.type = BOOL;
+                                                $$.value.boolean = -$2.value.boolean;
+                                                break;
+                                                case FLOAT:
+                                                $$.type = FLOAT;
+                                                $$.value.floating_point = -$2.value.floating_point;
+                                                break;
+                                                case CHARACTER:
+                                                $$.type = CHARACTER;
+                                                $$.value.character = -$2.value.character;
+                                                break;
+                                                case STRING:
+                                                yyerror("can't negate a string.");
+                                                exit(1);
+                                                break;
+                                            }
+                                        }   
+        |   term                          {
                                             switch($1.type)
                                             {
                                                 case INTEGER:

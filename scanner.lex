@@ -69,7 +69,6 @@ WHITESPACE [ \t\n]+
 "if"							return TOK_IF_KEY;
 "else"							return TOK_ELSE_KEY;
 "var"							return TOK_VAR_KEY;
-"ptr"							return TOK_PTR_KEY;
 
 "\+="							return TOK_SUMEQ_OP;				/*							OPERATORS								*/
 "\-="							return TOK_MINEQ_OP;
@@ -112,7 +111,6 @@ WHITESPACE [ \t\n]+
 "\]"							return TOK_RBRACKET_SBL;
 "stdout"						return TOK_STDOUT_STREAM;			/*							MACROS								*/
 "stdin"							return TOK_STDIN_STREAM;
-"print"							return TOK_PRINT_MACRO;
 <lnk>\"							BEGIN(INITIAL); 
 <lnk>[ \t]* 					/* Eat Whitespace */
 <lnk>[^\"]+ 					{
