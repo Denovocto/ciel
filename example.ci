@@ -1,4 +1,4 @@
-link "example_link.cl"
+link "example_link.ci"
 
 | This is an example program |
 function<int> main()
