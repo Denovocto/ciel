@@ -30,6 +30,10 @@ jobs:
         run: sudo apt-get install bison
       - name: make scanner
         run: make lexxer
+      - name: make parser
+        run: make parser
+      - name: make scanner_exe
+        run: make scanner_exe
       - name: make executable
         run: make executable
       # Runs a single command using the runners shell

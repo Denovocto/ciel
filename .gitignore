@@ -38,9 +38,18 @@
 *.app
 
 # Our own
+ciel
 ciel_scanner
 .DS_Store
 *.swp
 lex.yy.c
 lex.yy.cpp
+y.tab.c
+y.tab.h
+parser.tab.c
+parser.tab.h
+parser.tab.cpp
+parser.tab.hpp
+*.dSYM
+scanner.h
 .vscode
