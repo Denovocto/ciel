@@ -22,7 +22,7 @@ To successfully compile the project, your system will need to have installed:
 * flex library and toolchain
 * bison library and toolchain
 # GNU GCC instalation
-Before installing the GNU compiler toolchain, you shoukd verify if you already have it installed.
+Before installing the GNU compiler toolchain, you should verify if you already have it installed.
 To verify if you have it installed, head to your terminal application of choice and in the shell program,
 enter: `gcc --version` & then `g++ --version` this tells you which version you have as well as notifies you if it is already installed.
 To install them, you should first check the repositories of your system's package manager to install them. Most common package manager installations can be found below.
@@ -50,7 +50,7 @@ There are two main ways of using the Ciel interpreter.
 * Using it interactively
 * Using it on a file
 ## Using the Ciel interpreter interactively
-Once, you have compiled the Ciel interpreter successfully, you may run it interactively by just running the executable on its own withou tpassing any arguments to it. Like so: `./ciel`
+Once, you have compiled the Ciel interpreter successfully, you may run it interactively by just running the executable on its own without passing any arguments to it. Like so: `./ciel`
 ## Using the Ciel interpreter on a file
 To use the Ciel interpreter to interpret a file, you just pass the filename as an argument to the Ciel executable. Like so:
 `./ciel <filename>`
