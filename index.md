@@ -1,37 +1,21 @@
-## Welcome to GitHub Pages
+## Welcome to The Ciel Programming Language 
 
-You can use the [editor on GitHub](https://github.com/Denovocto/ciel/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+### Introduction to Ciel
+In this video you will see a brief description of how Ciel programming actually is: 
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-### Markdown
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### Motivation
+The main motivation behind the Ciel programming language is to explore interesting ideas and introduce them to the programming community in a fresh and simple manner such that it will prove to be pleasant and intuitive to work on. This is the reason why the Ciel team decided to create a language in which its syntax will be more clear and precise, because it will bring another interesting way of interacting and interfacing with a computer system in a much personalized or stylish way. Therefore, Ciel brings a more comfortable and orderly feel to its users.
 
-```markdown
-Syntax highlighted code block
+### Language Features
 
-# Header 1
-## Header 2
-### Header 3
+### Approach
+The Ciel programming language was designed with usability and readability in mind, without making compromise in performance. The ciel scanner is written in C using the C99 standard, whilst the Ciel Parser is written in C++ using the C++11 standard. The scanner generator used was Lex/Flex, while the parser generator used was Yacc/Bison. Additionally, we used the Makebuild system.
 
-- Bulleted
-- List
+### Contact
+Contributors of this project are: 
+- Jezreel Maldonado Ruiz
+- Mariely Ocasio Rodríguez
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Denovocto/ciel/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+Feel free to check out our repository and documentation at [ciel](https://github.com/Denovocto/ciel)
