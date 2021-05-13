@@ -17,6 +17,7 @@ The main motivation behind the Ciel programming language is to explore interesti
 * Different Variable Typed like: int, float, string, bool and char
 * Operations Between Types
 * Contextual Stack
+
 ### Approach
 The Ciel programming language was designed with usability and readability in mind, without making compromise in performance. The ciel scanner is written in C using the C99 standard, whilst the Ciel Parser is written in C++ using the C++11 standard. The scanner generator used was Lex/Flex, while the parser generator used was Yacc/Bison. Additionally, we used the Makebuild system.
 
