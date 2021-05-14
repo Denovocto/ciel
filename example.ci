@@ -1,11 +1,6 @@
 link "example_link.ci"
 
 | This is an example program |
-function<int> main()
-->
-	start:
-	ptr<int> a.
-	goto start.
-	stdout put "Hello World".
-	return 0.
-<-
+
+stdout put "2 * 2 is equal to: ".
+stdout put 2 * 2.

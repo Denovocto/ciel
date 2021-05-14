@@ -1,1 +1,1 @@
-1+1
+stdout put "Hello World".
