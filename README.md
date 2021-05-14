@@ -59,7 +59,7 @@ To use the Ciel interpreter to interpret a file, you just pass the filename as a
 `./ciel <filename>`
 # Example Code
 You can check out an example of a simple Hello World program written in Ciel language here: 
-[Example Program](https://github.com/Denovocto/Ciel/blob/master/example.cl)
+[Example Program](https://github.com/Denovocto/Ciel/blob/master/example.ci)
 
 # Contributors
 * Mariely Ocasio Rodriguez
