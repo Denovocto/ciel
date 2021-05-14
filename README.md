@@ -44,7 +44,8 @@ To install them, you should first check the repositories of your system's packag
 Before compiling the language you must make sure that your system meets all of the requirements and dependancies.
 To use the Ciel language interpreter, you must first compile its executable.
 To built the Ciel executable, use make like so:
-`make`
+`make`.
+
 A GIF for the instalation process can be found here:
 ![install process](docs/install.gif)
 # Running the Ciel interpreter
