@@ -144,8 +144,7 @@ statement   : assignment
 statements  : statement
             | statements statement
             ; 
-block       : 
-            | TOK_LARROW_SBL TOK_RARROW_SBL              
+block       : TOK_LARROW_SBL TOK_RARROW_SBL              
             | TOK_LARROW_SBL                                {
                                                                 std::unordered_map<std::string, symbol> newContext;
                                                                 contextStack.push_back(newContext);
@@ -207,6 +206,7 @@ macro       :   TOK_STDOUT_STREAM TOK_PUT_OP exp TOK_DOT_SBL{
                                                                             {
                                                                                 auto element = symbolTable.find($3);
                                                                                 if(element != symbolTable.end()) {
+                                                                                    std::cout << "#: " << (*element).first << std::endl;
                                                                                     switch(symbolTable[$3].type)
                                                                                     {
                                                                                         case INTEGER:
