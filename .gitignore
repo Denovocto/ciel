@@ -53,3 +53,4 @@ parser.tab.hpp
 *.dSYM
 scanner.h
 .vscode
+install.yml
