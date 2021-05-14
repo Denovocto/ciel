@@ -1,0 +1,219 @@
+# The configurations that used for the recording, feel free to edit them
+config:
+
+  # Specify a command to be executed
+  # like `/bin/bash -l`, `ls`, or any other commands
+  # the default is bash for Linux
+  # or powershell.exe for Windows
+  command: /bin/zsh --login
+  
+  # Specify the current working directory path
+  # the default is the current working directory path
+  cwd: /Users/jejo/Documents/RUM/Lenguajes/ciel
+  
+  # Export additional ENV variables
+  env:
+    recording: true
+  
+  # Explicitly set the number of columns
+  # or use `auto` to take the current
+  # number of columns of your shell
+  cols: 238
+  
+  # Explicitly set the number of rows
+  # or use `auto` to take the current
+  # number of rows of your shell
+  rows: 54
+  
+  # Amount of times to repeat GIF
+  # If value is -1, play once
+  # If value is 0, loop indefinitely
+  # If value is a positive number, loop n times
+  repeat: 0
+  
+  # Quality
+  # 1 - 100
+  quality: 100
+  
+  # Delay between frames in ms
+  # If the value is `auto` use the actual recording delays
+  frameDelay: auto
+  
+  # Maximum delay between frames in ms
+  # Ignored if the `frameDelay` isn't set to `auto`
+  # Set to `auto` to prevent limiting the max idle time
+  maxIdleTime: 2000
+  
+  # The surrounding frame box
+  # The `type` can be null, window, floating, or solid`
+  # To hide the title use the value null
+  # Don't forget to add a backgroundColor style with a null as type
+  frameBox:
+    type: floating
+    title: Terminalizer
+    style:
+      border: 0px black solid
+      # boxShadow: none
+      # margin: 0px
+  
+  # Add a watermark image to the rendered gif
+  # You need to specify an absolute path for
+  # the image on your machine or a URL, and you can also
+  # add your own CSS styles
+  watermark:
+    imagePath: null
+    style:
+      position: absolute
+      right: 15px
+      bottom: 15px
+      width: 100px
+      opacity: 0.9
+  
+  # Cursor style can be one of
+  # `block`, `underline`, or `bar`
+  cursorStyle: block
+  
+  # Font family
+  # You can use any font that is installed on your machine
+  # in CSS-like syntax
+  fontFamily: "MesloLGM Nerd Font Mono" 
+  
+  # The size of the font
+  fontSize: 12
+  
+  # The height of lines
+  lineHeight: 1
+  
+  # The spacing between letters
+  letterSpacing: 0
+  
+  # Theme
+  theme:
+    background: "transparent"
+    foreground: "#afafaf"
+    cursor: "#c7c7c7"
+    black: "#232628"
+    red: "#fc4384"
+    green: "#b3e33b"
+    yellow: "#ffa727"
+    blue: "#75dff2"
+    magenta: "#ae89fe"
+    cyan: "#708387"
+    white: "#d5d5d0"
+    brightBlack: "#626566"
+    brightRed: "#ff7fac"
+    brightGreen: "#c8ed71"
+    brightYellow: "#ebdf86"
+    brightBlue: "#75dff2"
+    brightMagenta: "#ae89fe"
+    brightCyan: "#b1c6ca"
+    brightWhite: "#f9f9f4"
+  
+# Records, feel free to edit them
+records:
+  - delay: 604
+    content: "\e[1m\e[7m%\e[27m\e[1m\e[0m                                                                                                                                                                                                                                             \r \r\e]2;jejo@Jezreels-MacBook-Pro:~/Documents/RUM/Lenguajes/ciel\a\e]1;..enguajes/ciel\a"
+  - delay: 381
+    content: "\r\e[0m\e[27m\e[24m\e[J\r\n\e[1m\e[0m\e[1m\e[36mciel\e[0m\e[36m\e[39m\e[1m \e[0m\e[1mon \e[0m\e[1m\e[37m\e[1m\e[37m\e[0m\e[37m\e[1m\e[37m\e[35m master\e[0m\e[35m\e[39m\e[1m\e[0m\e[1m\e[0m\e[1m\e[31m [?]\e[0m\e[31m\e[39m\e[1m\e[0m\e[0m\e[39m\e[1m \e[0m\r\n\e[1m\e[0m\e[1m\e[32m➜ \e[0m\e[32m\e[39m\e[1m\e[0m\e[K\e[?1h\e=\e[?2004h"
+  - delay: 2263
+    content: "\e[1m\e[31mm\e[0m\e[39m\e[90make\e[39m\b\b\b"
+  - delay: 43
+    content: "\b\e[1m\e[31mm\e[1m\e[31ma\e[0m\e[39m"
+  - delay: 118
+    content: "\b\b\e[1m\e[31mm\e[1m\e[31ma\e[1m\e[31mk\e[0m\e[39m"
+  - delay: 33
+    content: "\b\b\b\e[0m\e[32mm\e[0m\e[32ma\e[0m\e[32mk\e[32me\e[39m"
+  - delay: 391
+    content: "\e[?1l\e>\e[?2004l\r\r\n\e]2;make\a\e]1;make\a"
+  - delay: 14
+    content: "flex scanner.lex\r\n"
+  - delay: 44
+    content: "bison -d parser.ypp\r\n"
+  - delay: 9
+    content: "parser.ypp: warning: 82 shift/reduce conflicts [-Wconflicts-sr]\r\nparser.ypp: warning: 2 reduce/reduce conflicts [-Wconflicts-rr]\r\nparser.ypp: note: rerun with option '-Wcounterexamples' to generate conflict counterexamples\r\n"
+  - delay: 184
+    content: "gcc -c -g lex.yy.c -ll -lm\r\n"
+  - delay: 25
+    content: "clang: \e[0;1;35mwarning: \e[0m-ll: 'linker' input unused [-Wunused-command-line-argument]\e[0m\r\nclang: \e[0;1;35mwarning: \e[0m-lm: 'linker' input unused [-Wunused-command-line-argument]\e[0m\r\n"
+  - delay: 89
+    content: "g++ -g -o ciel lex.yy.o parser.tab.cpp -ll -lm\r\n"
+  - delay: 416
+    content: "\e[1mparser.ypp:206:81: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                            for(auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                ^\r\n\e[0m\e[1mparser.ypp:206:85: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrvalue references are a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                            for(auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                    ^\r\n\e[0m\e[1mparser.ypp:206:100: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrange-based for loop is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                            for(auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                                   ^\r\n\e[0m\e[1mparser.ypp:208:81: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                auto element = symbolTable.find((yyvsp[-1].identifier));\r\n\e[0;1;32m                                                                                ^\r\n\e[0m\e[1mparser.ypp:235:89: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                yyerror(\"Identifier not found\");\r\n\e[0;1;32m                                                                                        ^\r\n\e[0m\e[1mparser.ypp:319:107: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                toBeAdded->value.string = \"\";\r\n\e[0;1;32m                                                                                                          ^\r\n\e[0m\e[1mparser.ypp:333:86: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto symbolTable : contextStack)\r\n\e[0;1;32m                                                                                     ^\r\n\e[0m\e[1mparser.ypp:333:103: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrange-based for loop is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto symbolTable : contextStack)\r\n\e[0;1;32m                                                                                                      ^\r\n\e[0m\e[1mparser.ypp:336:90: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                    for (auto element : symbolTable)\r\n\e[0;1;32m                                                                                         ^\r\n\e[0m\e[1mparser.ypp:336:103: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrange-based for loop is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                    for (auto element : symbolTable)\r\n\e[0;1;32m                                                                                                      ^\r\n\e[0m\e[1mparser.ypp:339:85: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                    auto element = symbolTable.find((yyvsp[-3].identifier));\r\n\e[0;1;32m                                                                                    ^\r\n\e[0m\e[1mparser.ypp:366:93: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                    yyerror(\"Identifier not found\");\r\n\e[0;1;32m                                                                                            ^\r\n\e[0m\e[1mparser.ypp:373:86: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                     ^\r\n\e[0m\e[1mparser.ypp:373:90: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrvalue references are a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                         ^\r\n\e[0m\e[1mparser.ypp:373:105: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrange-based for loop is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                                        ^\r\n\e[0m\e[1mparser.ypp:375:85: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                    auto element = symbolTable.find((yyvsp[-3].identifier));\r\n\e[0;1;32m                                                                                    ^\r\n\e[0m\e[1mparser.ypp:392:101: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                            yyerror(\"cannot sum and equal to string\");\r\n\e[0;1;32m                                                                                                    ^\r\n\e[0m\e[1mparser.ypp:403:93: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                    yyerror(\"Identifier not found\");\r\n\e[0;1;32m                                                                                            ^\r\n\e[0m\e[1mparser.ypp:410:86: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                     ^\r\n\e[0m\e[1mparser.ypp:410:90: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrvalue references are a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                         ^\r\n\e[0m\e[1mparser.ypp:410:105: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrange-based for loop is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                                        ^\r\n\e[0m\e[1mparser.ypp:412:85: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                    auto element = symbolTable.find((yyvsp[-3].identifier));\r\n\e[0;1;32m                                                                                    ^\r\n\e[0m\e[1mparser.ypp:429:101: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                            yyerror(\"cannot minus and equal to string\");\r\n\e[0;1;32m                                                                                                    ^\r\n\e[0m\e[1mparser.ypp:440:93: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                    yyerror(\"Identifier not found\");\r\n\e[0;1;32m                                                                                            ^\r\n\e[0m\e[1mparser.ypp:447:86: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                     ^\r\n\e[0m\e[1mparser.ypp:447:90: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrvalue references are a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                         ^\r\n\e[0m\e[1mparser.ypp:447:105: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrange-based for loop is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                                        ^\r\n\e[0m\e[1mparser.ypp:449:85: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                    auto element = symbolTable.find((yyvsp[-3].identifier));\r\n\e[0;1;32m                                                                                    ^\r\n\e[0m\e[1mparser.ypp:466:101: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                            yyerror(\"cannot multiply and equal to string\");\r\n\e[0;1;32m                                                                                                    ^\r\n\e[0m\e[1mparser.ypp:477:93: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                    yyerror(\"Identifier not found\");\r\n\e[0;1;32m                                                                                            ^\r\n\e[0m\e[1mparser.ypp:485:86: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                     ^\r\n\e[0m\e[1mparser.ypp:485:90: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrvalue references are a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                         ^\r\n\e[0m\e[1mparser.ypp:485:105: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrange-based for loop is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                                        ^\r\n\e[0m\e[1mparser.ypp:487:85: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                    auto element = symbolTable.find((yyvsp[-3].identifier));\r\n\e[0;1;32m                                                                                    ^\r\n\e[0m\e[1mparser.ypp:504:101: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                            yyerror(\"cannot divide and equal to string\");\r\n\e[0;1;32m                                                                                                    ^\r\n\e[0m\e[1mparser.ypp:515:93: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                    yyerror(\"Identifier not found\"); \r\n\e[0;1;32m                                                                                            ^\r\n\e[0m\e[1mparser.ypp:522:86: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                     ^\r\n\e[0m\e[1mparser.ypp:522:90: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrvalue references are a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                         ^\r\n\e[0m\e[1mparser.ypp:522:105: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrange-based for loop is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                for (auto&& symbolTable : contextStack)\r\n\e[0;1;32m                                                                                                        ^\r\n\e[0m\e[1mparser.ypp:524:85: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                                                    auto element = symbolTable.find((yyvsp[-3].identifier));\r\n\e[0;1;32m                                                                                    ^\r\n\e[0m\e[1mparser.ypp:535:101: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                            yyerror(\"cannot modulus and equal to double\");\r\n\e[0;1;32m                                                                                                    ^\r\n\e[0m\e[1mparser.ypp:542:101: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                            yyerror(\"cannot modulus and equal to string\");\r\n\e[0;1;32m                                                                                                    ^\r\n\e[0m\e[1mparser.ypp:553:93: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                                                    yyerror(\"Identifier not found\");\r\n\e[0;1;32m                                                                                            ^\r\n\e[0m\e[1mparser.ypp:579:57: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                yyerror(\"can't negate a string.\");\r\n\e[0;1;32m                                                        ^\r\n\e[0m\e[1mparser.ypp:630:57: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                yyerror(\"cannot add strings\");\r\n\e[0;1;32m                                                        ^\r\n\e[0m\e[1mparser.ypp:655:57: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                yyerror(\"cannot substract strings\");\r\n\e[0;1;32m                                                        ^\r\n\e[0m\e[1mparser.ypp:680:57: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                yyerror(\"cannot multiply strings\");\r\n\e[0;1;32m                                                        ^\r\n\e[0m\e[1mparser.ypp:705:57: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                yyerror(\"cannot divide strings\");\r\n\e[0;1;32m                                                        ^\r\n\e[0m\e[1mparser.ypp:722:57: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                yyerror(\"cannot modulus floating point\");\r\n\e[0;1;32m                                                        ^\r\n\e[0m\e[1mparser.ypp:730:57: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                yyerror(\"cannot modulus strings\");\r\n\e[0;1;32m                                                        ^\r\n\e[0m\e[1mparser.ypp:755:57: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                yyerror(\"cannot exponentiate strings\");\r\n\e[0;1;32m                                                        ^\r\n\e[0m\e[1mparser.ypp:809:53: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                for(auto symbolTable : contextStack)\r\n\e[0;1;32m                                                    ^\r\n\e[0m\e[1mparser.ypp:809:70: \e[0m\e[0;1;35mwarning: \e[0m\e[1mrange-based for loop is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                for(auto symbolTable : contextStack)\r\n\e[0;1;32m                                                                     ^\r\n\e[0m\e[1mparser.ypp:811:53: \e[0m\e[0;1;35mwarning: \e[0m\e[1m'auto' type specifier is a C++11 extension [-Wc++11-extensions]\e[0m\r\n                                                    auto element = symbolTable.find((yyvsp[0].identifier));\r\n\e[0;1;32m                                                    ^\r\n\e[0m\e[1mparser.ypp:844:61: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n                                                    yyerror(\"Identifier not found\");\r\n\e[0;1;32m                                                            ^\r\n\e[0m\e[1mparser.tab.cpp:2257:20: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n      yyerror (YY_(\"syntax error\"));\r\n\e[0;1;32m                   ^\r\n\e[0m\e[1mparser.tab.cpp:2368:16: \e[0m\e[0;1;35mwarning: \e[0m\e[1mconversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]\e[0m\r\n  yyerror (YY_(\"memory exhausted\"));\r\n\e[0;1;32m               ^\r\n\e[0m"
+  - delay: 268
+    content: "57 warnings generated.\r\n"
+  - delay: 85
+    content: "\e[1m\e[7m%\e[27m\e[1m\e[0m                                                                                                                                                                                                                                             \r \r\e]2;jejo@Jezreels-MacBook-Pro:~/Documents/RUM/Lenguajes/ciel\a\e]1;..enguajes/ciel\a"
+  - delay: 330
+    content: "\r\e[0m\e[27m\e[24m\e[J\r\n\e[1m\e[0m\e[1m\e[36mciel\e[0m\e[36m\e[39m\e[1m \e[0m\e[1mon \e[0m\e[1m\e[37m\e[1m\e[37m\e[0m\e[37m\e[1m\e[37m\e[35m master\e[0m\e[35m\e[39m\e[1m\e[0m\e[1m\e[0m\e[1m\e[31m [?]\e[0m\e[31m\e[39m\e[1m\e[0m\e[0m\e[39m\e[1m \e[0m\e[1mtook \e[0m\e[1m\e[33m2s\e[0m\e[33m\e[39m\e[1m \e[0m\r\n\e[1m\e[0m\e[1m\e[32m➜ \e[0m\e[32m\e[39m\e[1m\e[0m\e[K\e[?1h\e=\e[?2004h"
+  - delay: 883
+    content: "\e[32m.\e[39m\e[90m/ciel\e[39m\b\b\b\b\b"
+  - delay: 130
+    content: "\b\e[4m\e[32m.\e[4m\e[32m/\e[24m\e[39m"
+  - delay: 689
+    content: "\b\b\e[39m\e[4m.\e[39m\e[4m/\e[39m\e[4mc\e[24m"
+  - delay: 119
+    content: "\b\e[4mc\e[39m\e[4mi\e[24m"
+  - delay: 76
+    content: "\b\e[4mi\e[39m\e[4me\e[24m"
+  - delay: 112
+    content: "\b\b\b\b\b\e[24m\e[32m.\e[24m\e[32m/\e[24m\e[32mc\e[24m\e[32mi\e[24m\e[32me\e[32ml\e[39m"
+  - delay: 283
+    content: "\e[?1l\e>\e[?2004l\r\r\n\e]2;./ciel\a\e]1;./ciel\a"
+  - delay: 1564
+    content: s
+  - delay: 114
+    content: t
+  - delay: 115
+    content: d
+  - delay: 153
+    content: o
+  - delay: 245
+    content: u
+  - delay: 74
+    content: t
+  - delay: 48
+    content: ' '
+  - delay: 572
+    content: p
+  - delay: 297
+    content: u
+  - delay: 171
+    content: t
+  - delay: 246
+    content: ' '
+  - delay: 764
+    content: '"'
+  - delay: 533
+    content: H
+  - delay: 886
+    content: e
+  - delay: 99
+    content: l
+  - delay: 105
+    content: l
+  - delay: 140
+    content: o
+  - delay: 452
+    content: ' '
+  - delay: 357
+    content: W
+  - delay: 252
+    content: o
+  - delay: 157
+    content: r
+  - delay: 70
+    content: l
+  - delay: 112
+    content: d
+  - delay: 611
+    content: '"'
+  - delay: 637
+    content: .
+  - delay: 292
+    content: "\r\nHello World\r\n"
+  - delay: 2144
+    content: "^C\r\n\e[1m\e[7m%\e[27m\e[1m\e[0m                                                                                                                                                                                                                                             \r \r\e]2;jejo@Jezreels-MacBook-Pro:~/Documents/RUM/Lenguajes/ciel\a\e]1;..enguajes/ciel\a"
+  - delay: 333
+    content: "\r\e[0m\e[27m\e[24m\e[J\r\n\e[1m\e[0m\e[1m\e[36mciel\e[0m\e[36m\e[39m\e[1m \e[0m\e[1mon \e[0m\e[1m\e[37m\e[1m\e[37m\e[0m\e[37m\e[1m\e[37m\e[35m master\e[0m\e[35m\e[39m\e[1m\e[0m\e[1m\e[0m\e[1m\e[31m [?]\e[0m\e[31m\e[39m\e[1m\e[0m\e[0m\e[39m\e[1m \e[0m\e[1mtook \e[0m\e[1m\e[33m11s\e[0m\e[33m\e[39m\e[1m \e[0m\r\n\e[1m\e[0m\e[1m\e[31m➜ \e[0m\e[31m\e[39m\e[1m\e[0m\e[K\e[?1h\e=\e[?2004h"
+  - delay: 1487
+    content: "\e[?2004l\r\r\n"
